@@ -988,24 +988,24 @@ let allStarsWithMessages = [];
 function initializeStaticMap() {
     console.log("🗺️ جاري إنشاء الخريطة الثابتة للنجوم...");
     
-    // إنشاء 10000 نجمة ثابتة مسبقاً بتوزيع عشوائي
-    for (let i = 0; i < 5000; i++) {
-        // توزيع عشوائي في مساحة كبيرة (20000 × 20000)
-        let x = (Math.random() - 0.5) * 30000;
-        let y = (Math.random() - 0.5) * 30000;
+    // استخدام DPR في حساب المسافات
+    const baseMinDistance = 120;
+    const adjustedMinDistance = baseMinDistance * (DPR > 1 ? 1.5 : 1); // زيادة المسافة على الهواتف
+    
+    for (let i = 0; i < 10000; i++) {
+        let x = (Math.random() - 0.5) * 20000;
+        let y = (Math.random() - 0.5) * 20000;
         
-        // التأكد من عدم تداخل النجوم - مسافة أكبر من جميع الجهات
         let ok = true;
         let tries = 0;
-        const minDistance = 200; // مسافة أكبر بين النجوم
-
-        while (tries < 50) { // زيادة عدد المحاولات
+        const minDistance = adjustedMinDistance; // استخدام المسافة المعدلة
+        
+        while (tries < 50) {
             ok = true;
             for (const existingStar of STATIC_STARS_MAP.values()) {
                 const distance = Math.hypot(existingStar.x - x, existingStar.y - y);
                 if (distance < minDistance) {
                     ok = false;
-                    // إعادة توليد موقع جديد
                     x = (Math.random() - 0.5) * 20000;
                     y = (Math.random() - 0.5) * 20000;
                     break;
@@ -1046,8 +1046,11 @@ setTimeout(() => {
 
 // دالة لتحميل النجوم المرئية فقط
 function loadVisibleStars() {
+    // تكييف مسافة الرؤية مع DPR
+    const baseVisibleDistance = 1500;
+    const visibleDistance = baseVisibleDistance * (DPR > 1 ? 1.3 : 1);
+    
     const visibleStars = [];
-    const visibleDistance = 2500; // مسافة الرؤية حول الكاميرا
     
     STATIC_STARS_MAP.forEach(star => {
         const dx = Math.abs(star.x - camera.x);
@@ -1990,7 +1993,10 @@ function draw(time){
   for(const s of visibleStars){
     const sx=(s.x-camera.x)+cx;
     const sy=(s.y-camera.y)+cy;
-    if(sx<-50||sx>w+50||sy<-50||sy>h+50)continue;
+    
+    // زيادة مسافة التخطي للنجوم البعيدة بناءً على DPR
+    const skipDistance = 100 * (DPR > 1 ? 1.5 : 1);
+    if(sx<-skipDistance||sx>w+skipDistance||sy<-skipDistance||sy>h+skipDistance)continue;
     
     if(s.id === 0 && moonImageLoaded) {
         const moonSize = 120 * DPR;
@@ -2006,7 +2012,11 @@ function draw(time){
     }
     
     const pulse=Math.sin(time*s.pulseSpeed/1000 + s.phase)*0.3 + 0.7;
-    const glow=s.size*(5+pulse*3)*DPR;
+    
+    // تكييس حجم التوهج بناءً على DPR
+    const glowMultiplier = DPR > 1 ? 0.8 : 1; // تقليل التوهج قليلاً على الهواتف
+    const glow=s.size*(5+pulse*3)*DPR * glowMultiplier;
+    
     const brightness=s.brightness*pulse;
     ctx.save();
     const grad=ctx.createRadialGradient(sx,sy,0,sx,sy,glow);
@@ -2023,7 +2033,12 @@ function draw(time){
     }  
     
     ctx.fillStyle = starColor;
-    ctx.globalAlpha=brightness; ctx.arc(sx,sy,s.size*DPR,0,Math.PI*2); ctx.fill();
+    
+    // تكييس حجم النجم بناءً على DPR
+    const starSizeMultiplier = DPR > 1 ? 0.9 : 1; // تصغير النجوم قليلاً على الهواتف
+    ctx.globalAlpha=brightness; 
+    ctx.arc(sx,sy,s.size*DPR * starSizeMultiplier,0,Math.PI*2); 
+    ctx.fill();
     ctx.globalAlpha=1;
     
     let textColor = '#fff';  
@@ -2039,7 +2054,9 @@ function draw(time){
     const rawText = s.title || s.id.toString();
     const text = rawText.substring(0, 15);  
     
-    ctx.fillText(text,sx,sy-15*DPR);
+    // تكييس مسافة النص عن النجم بناءً على DPR
+    const textDistance = 15 * DPR * (DPR > 1 ? 1.2 : 1);
+    ctx.fillText(text, sx, sy - textDistance);
   }
 }
 
