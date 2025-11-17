@@ -984,33 +984,62 @@ const STATIC_STARS_MAP = new Map();
 // قائمة النجوم ذات الرسائل (منفصلة عن النجوم المرئية)
 let allStarsWithMessages = [];
 
-// دالة لتهيئة الخريطة الثابتة
+// دالة لتهيئة الخريطة الثابتة مع تباعد محسّن
 function initializeStaticMap() {
     console.log("🗺️ جاري إنشاء الخريطة الثابتة للنجوم...");
     
-    // استخدام DPR في حساب المسافات
-    const baseMinDistance = 120;
-    const adjustedMinDistance = baseMinDistance * (DPR > 1 ? 1.5 : 1); // زيادة المسافة على الهواتف
+    // استخدام DPR في حساب المسافات - زيادة المسافة الأساسية
+    const baseMinDistance = 180; // زيادة من 120 إلى 180
+    const adjustedMinDistance = baseMinDistance * (DPR > 1 ? 1.3 : 1);
     
-    for (let i = 0; i < 10000; i++) {
-        let x = (Math.random() - 0.5) * 20000;
-        let y = (Math.random() - 0.5) * 20000;
+    // حجم المربع المخفي حول كل نجمة (نصف القطر)
+    const starHitBoxSize = adjustedMinDistance / 2;
+    
+    // إضافة نجمة رقم 1 في موقع مميز (وسط الشاشة تقريباً)
+    STATIC_STARS_MAP.set(0, {
+        id: 0,
+        x: 0,
+        y: 0,
+        size: 2.0,
+        brightness: 0.8,
+        pulseSpeed: 1.0,
+        phase: 0,
+        hasMessage: false,
+        message: null,
+        title: null,
+        uid: null,
+        opened: false,
+        showing: false,
+        docId: null,
+        isPinned: false,
+        hitBoxSize: starHitBoxSize
+    });
+    
+    for (let i = 1; i < 10000; i++) {
+        let x = (Math.random() - 0.5) * 25000; // زيادة مساحة التوزيع
+        let y = (Math.random() - 0.5) * 25000;
         
         let ok = true;
         let tries = 0;
-        const minDistance = adjustedMinDistance; // استخدام المسافة المعدلة
         
-        while (tries < 50) {
+        while (tries < 100) { // زيادة عدد المحاولات
             ok = true;
+            
             for (const existingStar of STATIC_STARS_MAP.values()) {
-                const distance = Math.hypot(existingStar.x - x, existingStar.y - y);
-                if (distance < minDistance) {
+                // حساب المسافة بين المربعات المخفية
+                const dx = Math.abs(existingStar.x - x);
+                const dy = Math.abs(existingStar.y - y);
+                
+                // إذا كانت المسافتين في X و Y أقل من الحجم المطلوب، فهناك تداخل
+                if (dx < adjustedMinDistance && dy < adjustedMinDistance) {
                     ok = false;
-                    x = (Math.random() - 0.5) * 20000;
-                    y = (Math.random() - 0.5) * 20000;
+                    // إعادة توليد موقع جديد بعيداً
+                    x = (Math.random() - 0.5) * 25000;
+                    y = (Math.random() - 0.5) * 25000;
                     break;
                 }
             }
+            
             if (ok) break;
             tries++;
         }
@@ -1031,17 +1060,52 @@ function initializeStaticMap() {
                 opened: false,
                 showing: false,
                 docId: null,
-                isPinned: false
+                isPinned: false,
+                hitBoxSize: starHitBoxSize
             });
+        } else {
+            console.log(`⚠️ لم يتم إضافة النجمة ${i} بعد ${tries} محاولة`);
         }
     }
     
     console.log(`✅ تم إنشاء ${STATIC_STARS_MAP.size} نجمة في الخريطة الثابتة`);
     
-// إخفاء شاشة التحميل بعد إنشاء النجوم
-setTimeout(() => {
-    document.getElementById('loadingScreen').style.display = 'none';
-}, 1000);
+    // التحقق من التباعد
+    checkStarSpacing();
+    
+    // إخفاء شاشة التحميل بعد إنشاء النجوم
+    setTimeout(() => {
+        document.getElementById('loadingScreen').style.display = 'none';
+    }, 1000);
+}
+
+// دالة للتحقق من التباعد بين النجوم
+function checkStarSpacing() {
+    let minDistance = Infinity;
+    let tooCloseCount = 0;
+    
+    STATIC_STARS_MAP.forEach((star1, id1) => {
+        STATIC_STARS_MAP.forEach((star2, id2) => {
+            if (id1 >= id2) return; // تجنب الحسابات المكررة
+            
+            const dx = Math.abs(star1.x - star2.x);
+            const dy = Math.abs(star1.y - star2.y);
+            const distance = Math.hypot(dx, dy);
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+            
+            // إذا كانت النجوم قريبة جداً
+            if (distance < 100) {
+                tooCloseCount++;
+                console.log(`❌ النجوم ${id1} و ${id2} قريبة جداً: ${distance.toFixed(1)}`);
+            }
+        });
+    });
+    
+    console.log(`📊 أقصر مسافة بين نجمين: ${minDistance.toFixed(1)}`);
+    console.log(`📊 عدد النجوم المتقاربة جداً: ${tooCloseCount}`);
 }
 
 // دالة لتحميل النجوم المرئية فقط
@@ -1186,7 +1250,7 @@ function startRepliesListener() {
           });
           console.log(`✅ تم تحميل الإعجابات. عدد الإعجابات في الكاش: ${cachedLikes.size}`);
       } catch (error) {
-          console.error("❌ فشل تحميل الإعجابات من Firebase:", error);
+        console.error("❌ فشل تحميل الإعجابات من Firebase:", error);
       }
   }
   
