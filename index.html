@@ -1087,10 +1087,131 @@ function initializeStaticMap() {
     // التحقق من التباعد
     checkStarSpacing();
     
-    // إخفاء شاشة التحميل بعد إنشاء النجوم
-    setTimeout(() => {
-        document.getElementById('loadingScreen').style.display = 'none';
-    }, 1000);
+// دالة لتهيئة الخريطة الثابتة مع تباعد محسّن
+function initializeStaticMap() {
+    console.log("🗺️ جاري إنشاء الخريطة الثابتة للنجوم...");
+    
+    // إخفاء شاشة التحميل فوراً حتى لا تبقى معلقة
+    const loadingScreen = document.getElementById('loadingScreen');
+    
+    // زيادة كبيرة في المسافة الأساسية
+    const baseMinDistance = 250;
+    const adjustedMinDistance = baseMinDistance * (DPR > 1 ? 1.4 : 1);
+    
+    // حجم المربع المخفي حول كل نجمة (نصف القطر)
+    const starHitBoxSize = adjustedMinDistance / 2;
+    
+    // زيادة مساحة التوزيع الكلية
+    const distributionArea = 35000;
+    
+    // إضافة نجمة رقم 1 في موقع مميز (وسط الشاشة تقريباً)
+    STATIC_STARS_MAP.set(0, {
+        id: 0,
+        x: 0,
+        y: 0,
+        size: 2.2,
+        brightness: 0.9,
+        pulseSpeed: 1.0,
+        phase: 0,
+        hasMessage: false,
+        message: null,
+        title: null,
+        uid: null,
+        opened: false,
+        showing: false,
+        docId: null,
+        isPinned: false,
+        hitBoxSize: starHitBoxSize
+    });
+    
+    // تقليل عدد النجوم قليلاً لتحسين التباعد
+    const totalStars = 3000; // تقليل أكثر لتحسين الأداء
+    
+    let starsCreated = 0;
+    const batchSize = 500; // إنشاء النجوم على دفعات
+    
+    function createStarsBatch(startIndex, endIndex) {
+        for (let i = startIndex; i < endIndex && i < totalStars; i++) {
+            let x = (Math.random() - 0.5) * distributionArea;
+            let y = (Math.random() - 0.5) * distributionArea;
+            
+            let ok = true;
+            let tries = 0;
+            const maxTries = 50; // تقليل المحاولات لتحسين الأداء
+            
+            while (tries < maxTries) {
+                ok = true;
+                
+                for (const existingStar of STATIC_STARS_MAP.values()) {
+                    const dx = Math.abs(existingStar.x - x);
+                    const dy = Math.abs(existingStar.y - y);
+                    
+                    if (dx < adjustedMinDistance && dy < adjustedMinDistance) {
+                        ok = false;
+                        break;
+                    }
+                }
+                
+                if (ok) break;
+                
+                // إعادة توليد موقع جديد
+                x = (Math.random() - 0.5) * distributionArea;
+                y = (Math.random() - 0.5) * distributionArea;
+                tries++;
+            }
+            
+            if (ok) {
+                STATIC_STARS_MAP.set(i, {
+                    id: i,
+                    x: x,
+                    y: y,
+                    size: Math.max(0.5, Math.random()*2.0),
+                    brightness: 0.4 + Math.random()*0.6,
+                    pulseSpeed: 0.5 + Math.random()*1.5,
+                    phase: Math.random()*Math.PI*2,
+                    hasMessage: false,
+                    message: null,
+                    title: null,
+                    uid: null,
+                    opened: false,
+                    showing: false,
+                    docId: null,
+                    isPinned: false,
+                    hitBoxSize: starHitBoxSize
+                });
+                starsCreated++;
+            }
+        }
+        
+        // تحديث شاشة التحميل
+        const progress = Math.min(100, Math.round((starsCreated / totalStars) * 100));
+        loadingScreen.innerHTML = `
+            <div class="loading-spinner"></div>
+            <div>جاري تحميل النجوم... ${progress}% ✨</div>
+        `;
+        
+        // إذا لم ننتهِ بعد، نستمر في الدفعة التالية
+        if (starsCreated < totalStars) {
+            setTimeout(() => {
+                createStarsBatch(starsCreated, starsCreated + batchSize);
+            }, 10);
+        } else {
+            // انتهينا من إنشاء جميع النجوم
+            console.log(`✅ تم إنشاء ${STATIC_STARS_MAP.size} نجمة في الخريطة الثابتة`);
+            
+            // التحقق من التباعد
+            checkStarSpacing();
+            
+            // إخفاء شاشة التحميل
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                console.log("🎉 تم تحميل التطبيق بنجاح!");
+            }, 500);
+        }
+    }
+    
+    // بدء إنشاء النجوم على دفعات
+    createStarsBatch(1, batchSize);
 }
 
 // دالة للتحقق من التباعد بين النجوم
