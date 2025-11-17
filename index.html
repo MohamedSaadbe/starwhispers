@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8296425494322351" crossorigin="anonymous"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>StarWhispers (همسات النجوم)</title> 
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+<style>
+/* CSS الأساسي - تم تحسينه للجوال */
+html,body{
+    height:100%;
+    margin:0;
+    background:#000;
+    overflow:hidden;
+    color:#fff;
+    font-family: 'Cairo', system-ui, Segoe UI, Roboto, Arial, sans-serif;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+canvas{
+    display:block;
+    width:100%;
+    height:100%;
+    touch-action: none;
+}
+
+#messageModal {
+    position: fixed; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%); 
+    background: rgba(0,0,0,0.95); 
+    padding: 20px; 
+    border-radius: 12px; 
+    display: none; 
+    z-index: 30; 
+    color: #fff; 
+    font-family: 'IBM Plex Mono', monospace; 
+    width: 90vw;
+    max-width: 90vw;
+    text-align: center;
+    box-sizing: border-box;
+}
+#messageModal input.titleInput { 
+    width: 100%; 
+    padding: 10px; 
+    margin-bottom: 10px; 
+    font-size: 16px; 
+    border-radius: 6px; 
+    border: 1px solid #555; 
+    background: #111; 
+    color: #0f0; 
+    display: block; 
+    box-sizing: border-box;
+}
+#messageModal textarea { 
+    width: 100%; 
+    min-height: 120px; 
+    max-height: 50vh; 
+    margin-bottom: 10px; 
+    background: #111; 
+    color: #ffa500;
+    border: 1px solid #555; 
+    border-radius: 6px; 
+    padding: 10px; 
+    resize: vertical; 
+    font-family: 'IBM Plex Mono', monospace; 
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+#messageModal button { 
+    margin: 0 5px; 
+    padding: 10px 15px; 
+    border:none; 
+    border-radius:6px; 
+    cursor:pointer; 
+    background: #0f0; 
+    color: #000; 
+    font-weight:bold;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+}
+#messageModal button.cancel {
+    background: #888; 
+    color: #fff;
+}
+
+.starMessage { 
+    position: fixed; 
+    padding: 12px 15px; 
+    background: rgba(0,0,0,0.95); 
+    color: #ffa500; 
+    border-radius: 8px; 
+    font-family: 'IBM Plex Mono', monospace; 
+    font-size: 16px; 
+    pointer-events: auto; 
+    opacity: 0; 
+    transition: opacity 0.3s; 
+    white-space: pre-wrap; 
+    word-wrap: break-word; 
+    max-width: 90vw; 
+    max-height: 50vh; 
+    overflow-y: auto; 
+    direction: rtl; 
+    text-align: right; 
+    box-sizing: border-box;
+    z-index: 25;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+.starMessage::-webkit-scrollbar { width: 3px; }
+.starMessage::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
+.starMessage::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+.starMessage::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+
+:root {
+    --control-bg: rgba(255, 255, 255, 0.1);
+    --control-border: rgba(255, 255, 255, 0.3);
+    --control-color: rgba(255, 255, 255, 0.8);
+}
+
+#fabButton {
+    position: fixed;
+    top: 15px; 
+    right: 15px; 
+    width: auto; 
+    height: auto; 
+    background: transparent; 
+    color: #fff; 
+    border: none; 
+    font-size: 28px; 
+    line-height: 1; 
+    text-align: center;
+    cursor: pointer;
+    z-index: 50; 
+    font-family: Arial, sans-serif; 
+    display: block; 
+    transition: transform 0.3s ease, color 0.2s;
+    touch-action: manipulation;
+    padding: 5px;
+    border-radius: 0;
+    box-shadow: none;
+}
+#fabButton:hover {
+    color: #ffcc00; 
+    transform: scale(1.2);
+    background: transparent;
+}
+#fabButton:active,
+#fabButton:focus {
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#navigateStarBtn {
+    position: fixed;
+    bottom: 80px;
+    left: 15px;
+    width: 75px; 
+    height: 75px; 
+    border-radius: 50%; 
+    background: transparent; 
+    border: none; 
+    color: transparent; 
+    font-size: 0; 
+    text-align: center;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s ease;
+    display: block;
+    touch-action: manipulation;
+    background-image: url('spacecraft.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: brightness(1);
+}
+
+#navigateStarBtn:hover {
+    transform: scale(1.15);
+    filter: brightness(1.3);
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.5);
+}
+
+#navigateStarBtn:active {
+    transform: scale(0.9);
+    filter: brightness(0.8);
+}
+
+/* لوحة التحكم الجانبية - محسنة للجوال */
+#userPanel {
+    position: fixed;
+    top: 0; 
+    right: 0; 
+    height: 100%; 
+    width: 70vw;
+    max-width: 250px;
+    padding: 15px; 
+    z-index: 45; 
+    text-align: right;
+    display: none; 
+    flex-direction: column;
+    align-items: flex-end;
+    font-family: 'Cairo', sans-serif;
+    background: rgba(0, 0, 0, 0.98); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px);
+    border-left: 2px solid var(--control-border); 
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out; 
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.8);
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+#userPanel.open {
+    transform: translateX(0);
+}
+
+/* تحية واسم المستخدم في الأعلى */
+#userGreeting {
+    margin: 10px 0 20px 0; 
+    color: #0f0; 
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    order: 1; 
+    font-size: 1.1em;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--control-border);
+    width: 100%;
+    text-align: center;
+}
+
+/* قسم اختيار نوع الرسائل في لوحة التحكم */
+.message-type-section {
+    width: 100%;
+    margin: 15px 0;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--control-border);
+}
+
+.message-type-section h4 {
+    margin: 0 0 12px 0;
+    color: #0f0;
+    font-size: 15px;
+    text-align: center;
+}
+
+.message-type-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.message-type-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 13px;
+    border: 1px solid transparent;
+}
+
+.message-type-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.message-type-option.active {
+    background: #0f0;
+    color: #000;
+    font-weight: bold;
+    border-color: #0f0;
+}
+
+.message-type-option .badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 12px;
+    padding: 2px 6px;
+    font-size: 10px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.message-type-option.active .badge {
+    background: rgba(0, 0, 0, 0.3);
+    color: #000;
+}
+
+/* قسم حالة الرسائل العامة */
+.message-status-section {
+    width: 100%;
+    margin: 12px 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.message-status-section h5 {
+    margin: 0 0 8px 0;
+    color: #ffa500;
+    font-size: 13px;
+    text-align: center;
+}
+
+.message-status-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.message-status-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 13px;
+}
+
+.message-status-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.message-status-option.active {
+    background: #ffa500;
+    color: #000;
+    font-weight: bold;
+}
+
+/* أزرار لوحة التحكم */
+#userPanel button {
+    background: var(--control-bg); 
+    color: var(--control-color);
+    border: 1px solid var(--control-border); 
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 8px;
+    margin-right: 0px;
+    font-size: 13px;
+    order: 2; 
+    width: 100%; 
+    font-family: 'Cairo', sans-serif;
+    transition: background 0.2s, border-color 0.2s;
+    font-weight: 500;
+    touch-action: manipulation;
+}
+#userPanel button:hover {
+    background: rgba(255, 255, 255, 0.15); 
+    border-color: #fff; 
+    color: #fff;
+}
+
+/* أزرار التحكم الجديدة أسفل الشاشة - محسنة للجوال */
+#controlButtons {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: row;
+    gap: 6px;
+    z-index: 40;
+    width: 95vw;
+    max-width: 95vw;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 12px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-sizing: border-box;
+    -ms-overflow-style: none;
+}
+
+#controlButtons::-webkit-scrollbar {
+    display: none;
+}
+
+.control-btn {
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    opacity: 0.9;
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-block;
+    min-width: max-content;
+    touch-action: manipulation;
+}
+
+.control-btn:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+#editMessageControlBtn { background: #ffa500; color: #000; }
+#pinMessageControlBtn { background: #009688; color: #fff; }
+#likeControlBtn { background: #e91e63; color: #fff; }
+#likersControlBtn { background: #9c27b0; color: #fff; }
+#addFavoriteControlBtn { background: #4CAF50; color: #fff; }
+#addFavoriteControlBtn.favorite { background: #f44336; color: #fff; }
+#favoritesListControlBtn { background: #2196F3; color: #fff; }
+#replyControlBtn { background: #FF9800; color: #fff; }
+#deleteMessageControlBtn { background: #f44336; color: white; }
+
+/* تأثير القلوب المتعددة */
+.flying-hearts-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.flying-heart {
+    position: absolute;
+    font-size: 18px;
+    opacity: 0.7;
+    z-index: 100;
+    pointer-events: none;
+    animation: flyHeart 1.5s ease-out forwards;
+}
+
+@keyframes flyHeart {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0.3);
+        opacity: 0;
+    }
+}
+
+#likersModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.95);
+    padding: 20px;
+    border-radius: 12px;
+    display: none;
+    z-index: 70;
+    color: #fff;
+    text-align: center;
+    border: 1px solid #e91e63;
+    font-family: 'Cairo', sans-serif;
+    width: 90vw;
+    max-width: 90vw;
+    max-height: 70vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+#likersModal h3 {
+    color: #e91e63;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#likersList {
+    text-align: right;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+}
+
+#likersList div {
+    padding: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+#closeLikersBtn {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: #e91e63;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+}
+
+/* تنسيقات نافذة الردود */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 100;
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #0f0;
+    width: 95vw;
+    max-width: 95vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    font-family: 'Cairo', sans-serif;
+    box-sizing: border-box;
+}
+
+.modal-content h3 {
+    color: #0f0;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#repliesList {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.reply-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: right;
+}
+
+.reply-author {
+    color: #ffa500;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.reply-text {
+    color: #87CEEB;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+#replyInput {
+    width: 100%;
+    min-height: 100px;
+    margin-bottom: 15px;
+    background: #111;
+    color: #ffa500;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 10px;
+    resize: vertical;
+    font-family: 'IBM Plex Mono', monospace;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.modal-buttons button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    min-width: 100px;
+}
+
+#sendReplyBtn {
+    background: #0f0;
+    color: #000;
+}
+
+#closeReplyBtn {
+    background: #888;
+    color: #fff;
+}
+
+/* نافذة قائمة المفضلة */
+#favoritesModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.95);
+    padding: 20px;
+    border-radius: 12px;
+    display: none;
+    z-index: 70;
+    color: #fff;
+    text-align: center;
+    border: 1px solid #FFD700;
+    font-family: 'Cairo', sans-serif;
+    width: 90vw;
+    max-width: 90vw;
+    max-height: 70vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+#favoritesModal h3 {
+    color: #FFD700;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#favoritesList {
+    text-align: right;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+}
+
+#favoritesList div {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-family: 'IBM Plex Mono', monospace;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.favorite-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.remove-favorite-btn {
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Cairo', sans-serif;
+}
+
+#closeFavoritesBtn {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: #FFD700;
+    color: black;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+}
+
+.control-btn.with-badge {
+    position: relative;
+}
+
+.badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #e91e63;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* تحسينات للشاشات الصغيرة جداً */
+@media (max-width: 360px) {
+    #controlButtons {
+        padding: 6px 8px;
+        gap: 4px;
+    }
+    
+    .control-btn {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+    
+    #fabButton {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+        line-height: 45px;
+    }
+    
+    #navigateStarBtn {
+        width: 50px;
+        height: 50px;
+        font-size: 22px;
+        line-height: 50px;
+    }
+    
+    .starMessage {
+        font-size: 15px;
+        padding: 10px 12px;
+    }
+}
+
+/* منع التكبير عند النقر المزدوج على الجوال */
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+input, textarea {
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* تحسين الأداء على الجوال */
+canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+
+</style>
+</head>
+<body>
+<canvas id="c" touch-action="none"></canvas>
+
+<!-- حاوية القلوب الطائرة -->
+<div id="flyingHeartsContainer" class="flying-hearts-container"></div>
+
+<button id="fabButton">⚙️</button>
+<button id="navigateStarBtn">🔍</button>
+
+<!-- أزرار التحكم الجديدة أسفل الشاشة -->
+<div id="controlButtons">
+    <button id="editMessageControlBtn" class="control-btn">تغيير الرسالة</button>
+    <button id="pinMessageControlBtn" class="control-btn">تثبيت الرسالة</button>
+    <button id="deleteMessageControlBtn" class="control-btn">حذف الرسالة</button>
+    <button id="addFavoriteControlBtn" class="control-btn">إضافة للمفضلة</button>
+    <button id="favoritesListControlBtn" class="control-btn">قائمة المفضلة</button>
+    <button id="replyControlBtn" class="control-btn with-badge">الردود <span class="badge" id="replyCount">0</span></button>
+    <button id="likersControlBtn" class="control-btn">المعجبون (0)</button>
+    <button id="likeControlBtn" class="control-btn">جميلة ❤️</button>
+</div>
+
+<!-- لوحة التحكم الجانبية المحسنة -->
+<div id="userPanel">
+    <!-- تحية واسم المستخدم في الأعلى -->
+    <div id="userGreeting">مرحباً في همسات النجوم! ✨</div>
+    
+    <!-- قسم اختيار نوع الرسائل في لوحة التحكم -->
+    <div class="message-type-section">
+        <h4>نوع الرسائل</h4>
+        <div class="message-type-options">
+            <div class="message-type-option active" data-type="all">
+                <span>كل الرسائل</span>
+                <span class="badge" id="allMessagesCount">0</span>
+            </div>
+            
+            <div class="message-type-option" data-type="favorites">
+                <span>رسائل المفضلة</span>
+                <span class="badge" id="favoritesMessagesCount">0</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- قسم حالة الرسائل العامة - واحد لجميع الأنواع -->
+    <div class="message-status-section">
+        <h5>حالة الرسائل</h5>
+        <div class="message-status-options">
+            <div class="message-status-option active" data-status="all">
+                <span>الكل</span>
+            </div>
+            <div class="message-status-option" data-status="read">
+                <span>المقروءة</span>
+            </div>
+            <div class="message-status-option" data-status="unread">
+                <span>غير المقروءة</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="messageModal">
+  <div>🌟 اكتب شيئا رائعا </div>
+  <input type="text" class="titleInput" id="titleInput" placeholder="العنوان كلمة واحدة (15 حرف كحد أقصى)"> 
+  <textarea id="messageInput" placeholder="نص الرسالة"></textarea><br/>
+  <button id="sendBtn">حفظ</button>
+  <button class="cancel" id="cancelBtn">إلغاء</button>
+</div>
+
+<div id="likersModal">
+    <h3>المعجبون بهذه الرسالة</h3>
+    <div id="likersList"></div>
+    <button id="closeLikersBtn">إغلاق</button>
+</div>
+
+<div id="favoritesModal">
+    <h3>قائمة المفضلة</h3>
+    <div id="favoritesList"></div>
+    <button id="closeFavoritesBtn">إغلاق</button>
+</div>
+
+<div id="replyModal" class="modal">
+    <div class="modal-content">
+        <h3>الردود على الرسالة</h3>
+        <div id="repliesList"></div>
+        <textarea id="replyInput" placeholder="اكتب ردك هنا..."></textarea>
+        <div class="modal-buttons">
+            <button id="sendReplyBtn">إرسال الرد</button>
+            <button id="closeReplyBtn">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, query, where, getDocs, deleteField, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  
+const moonImage = new Image();
+moonImage.src = 'moon.png';
+let moonImageLoaded = false;
+
+moonImage.onload = function() {
+    moonImageLoaded = true;
+    console.log('✅ تم تحميل صورة القمر بنجاح');
+};
+
+moonImage.onerror = function() {
+    console.error('❌ فشل تحميل صورة القمر');
+};
+
+  function simpleUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+      });
+  }
+
+  function getDeviceUUID() {
+      let deviceId = localStorage.getItem('deviceUUID');
+      if (!deviceId) {
+          deviceId = simpleUUID();
+          localStorage.setItem('deviceUUID', deviceId);
+      }
+      return deviceId;
+  }
+  
+  const DEVICE_UUID = getDeviceUUID();
+  
+  // بيانات المستخدم الأساسية بدون تسجيل دخول
+  let currentUser = {
+    uid: `guest_${DEVICE_UUID}`,
+    displayName: 'زائر',
+    readStarIds: {},
+    favorites: []
+  };
+
+  function saveUserToLocal() {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  }
+  
+  function loadUserFromLocal() {
+      const saved = localStorage.getItem('currentUser');
+      if (saved) {
+          currentUser = JSON.parse(saved);
+      }
+      return currentUser;
+  }
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCxNgh_8Q2qSpoPlBZpLgbeXqmedXXNkE8",
+    authDomain: "night-star-d716a.firebaseapp.com",
+    projectId: "night-star-d716a",
+    storageBucket: "night-star-d716a.firebasestorage.app",
+    messagingSenderId: "246582207525",
+    appId: "1:246582207525:web:5808283c37060d6bc68bcc"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  
+  const MESSAGES_COLLECTION = collection(db, "messages");
+  const LIKES_COLLECTION = collection(db, "likes");
+  const FAVORITES_COLLECTION = collection(db, "favorites");
+  const REPLIES_COLLECTION = collection(db, "replies");
+
+  let cachedMessages = new Map();
+  let lastTouchedStar = null;  
+  
+// 🔥 Real-time Listener للرسائل الجديدة
+import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// خريطة النجوم الثابتة
+const STATIC_STARS_MAP = new Map();
+// قائمة النجوم ذات الرسائل (منفصلة عن النجوم المرئية)
+let allStarsWithMessages = [];
+
+// دالة لتهيئة الخريطة الثابتة
+function initializeStaticMap() {
+    console.log("🗺️ جاري إنشاء الخريطة الثابتة للنجوم...");
+    
+    // إنشاء 10000 نجمة ثابتة مسبقاً بتوزيع عشوائي
+    for (let i = 0; i < 10000; i++) {
+        // توزيع عشوائي في مساحة كبيرة (20000 × 20000)
+        let x = (Math.random() - 0.5) * 20000;
+        let y = (Math.random() - 0.5) * 20000;
+        
+        // التأكد من عدم تداخل النجوم - مسافة أكبر من جميع الجهات
+        let ok = true;
+        let tries = 0;
+        const minDistance = 120; // مسافة أكبر بين النجوم
+
+        while (tries < 50) { // زيادة عدد المحاولات
+            ok = true;
+            for (const existingStar of STATIC_STARS_MAP.values()) {
+                const distance = Math.hypot(existingStar.x - x, existingStar.y - y);
+                if (distance < minDistance) {
+                    ok = false;
+                    // إعادة توليد موقع جديد
+                    x = (Math.random() - 0.5) * 20000;
+                    y = (Math.random() - 0.5) * 20000;
+                    break;
+                }
+            }
+            if (ok) break;
+            tries++;
+        }
+        
+        if (ok) {
+            STATIC_STARS_MAP.set(i, {
+                id: i,
+                x: x,
+                y: y,
+                size: Math.max(0.6, Math.random()*2.5),
+                brightness: 0.4 + Math.random()*0.6,
+                pulseSpeed: 0.5 + Math.random()*1.5,
+                phase: Math.random()*Math.PI*2,
+                hasMessage: false,
+                message: null,
+                title: null,
+                uid: null,
+                opened: false,
+                showing: false,
+                docId: null,
+                isPinned: false
+            });
+        }
+    }
+    
+    console.log(`✅ تم إنشاء ${STATIC_STARS_MAP.size} نجمة في الخريطة الثابتة`);
+}
+
+// دالة لتحميل النجوم المرئية فقط
+function loadVisibleStars() {
+    const visibleStars = [];
+    const visibleDistance = 1500; // مسافة الرؤية حول الكاميرا
+    
+    STATIC_STARS_MAP.forEach(star => {
+        const dx = Math.abs(star.x - camera.x);
+        const dy = Math.abs(star.y - camera.y);
+        
+        if (dx < visibleDistance && dy < visibleDistance) {
+            visibleStars.push(star);
+        }
+    });
+    
+    return visibleStars;
+}
+
+// دالة لبدء الاستماع للتحديثات في الوقت الحقيقي
+function startMessagesListener() {
+    try {
+        console.log("🎯 بدء الاستماع للتحديثات في الوقت الحقيقي...");
+        
+        onSnapshot(MESSAGES_COLLECTION, (snapshot) => {
+            console.log("🔄 تم اكتشاف تحديث في قاعدة البيانات");
+            
+            snapshot.docChanges().forEach((change) => {
+                const starId = change.doc.id;
+                const messageData = change.doc.data();
+                
+                if (change.type === 'added' || change.type === 'modified') {
+                    cachedMessages.set(starId, messageData);
+                    console.log(`✅ تم تحديث الرسالة: ${starId}`);
+                    
+                    bindMessagesToStars(cachedMessages);
+                    
+                } else if (change.type === 'removed') {
+                    cachedMessages.delete(starId);
+                    console.log(`🗑️ تم حذف الرسالة: ${starId}`);
+                    
+                    bindMessagesToStars(cachedMessages);
+                }
+            });
+            
+            updateMessageCounts();
+        });
+        
+        console.log("✅ تم تفعيل الاستماع للتحديثات في الوقت الحقيقي");
+        
+    } catch (error) {
+        console.error("❌ فشل في تفعيل الاستماع للتحديثات:", error);
+    }
+}
+
+// 🔥 Real-time Listener للإعجابات
+function startLikesListener() {
+    try {
+        onSnapshot(LIKES_COLLECTION, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                const starId = change.doc.id;
+                const likesData = change.doc.data();
+                
+                cachedLikes.set(starId, likesData);
+                
+                if (lastTouchedStar && lastTouchedStar.id.toString() === starId) {
+                    updateLikersButton(starId);
+                }
+            });
+        });
+    } catch (error) {
+        console.error("❌ فشل في تفعيل الاستماع للإعجابات:", error);
+    }
+}
+
+// 🔥 Real-time Listener للردود
+function startRepliesListener() {
+    try {
+        onSnapshot(REPLIES_COLLECTION, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                const starId = change.doc.id;
+                
+                if (lastTouchedStar && lastTouchedStar.id.toString() === starId) {
+                    updateReplyCount();
+                }
+            });
+        });
+    } catch (error) {
+        console.error("❌ فشل في تفعيل الاستماع للردود:", error);
+    }
+}
+
+  const userPanel = document.getElementById('userPanel');
+  const userGreeting = document.getElementById('userGreeting');
+  
+  const fabButton = document.getElementById('fabButton');
+  const navigateStarBtn = document.getElementById('navigateStarBtn');
+
+  const allMessagesCount = document.getElementById('allMessagesCount');
+  const favoritesMessagesCount = document.getElementById('favoritesMessagesCount');
+
+  const controlButtons = document.getElementById('controlButtons');
+  const editMessageControlBtn = document.getElementById('editMessageControlBtn');
+  const pinMessageControlBtn = document.getElementById('pinMessageControlBtn');
+  const deleteMessageControlBtn = document.getElementById('deleteMessageControlBtn');
+  const likeControlBtn = document.getElementById('likeControlBtn');
+  const likersControlBtn = document.getElementById('likersControlBtn');
+  const addFavoriteControlBtn = document.getElementById('addFavoriteControlBtn');
+  const favoritesListControlBtn = document.getElementById('favoritesListControlBtn');
+  const replyControlBtn = document.getElementById('replyControlBtn');
+  const replyCount = document.getElementById('replyCount');
+
+  const likersModal = document.getElementById('likersModal');
+  const likersList = document.getElementById('likersList');
+  const closeLikersBtn = document.getElementById('closeLikersBtn');
+
+  const favoritesModal = document.getElementById('favoritesModal');
+  const favoritesList = document.getElementById('favoritesList');
+  const closeFavoritesBtn = document.getElementById('closeFavoritesBtn');
+
+  const messageModal=document.getElementById('messageModal');
+  const messageInput=document.getElementById('messageInput');
+  const titleInput=document.getElementById('titleInput'); 
+  const sendBtn=document.getElementById('sendBtn');
+  const cancelBtn=document.getElementById('cancelBtn');
+  let activeStar=null;
+
+  let navigationMode = 'all';
+  let messageStatusFilter = 'all';
+
+  let cachedLikes = new Map();
+  
+  async function loadAndCacheLikes() {
+      try {
+          const querySnapshot = await getDocs(LIKES_COLLECTION);
+          cachedLikes.clear();
+          querySnapshot.forEach((doc) => {
+              cachedLikes.set(doc.id, doc.data());
+          });
+          console.log(`✅ تم تحميل الإعجابات. عدد الإعجابات في الكاش: ${cachedLikes.size}`);
+      } catch (error) {
+          console.error("❌ فشل تحميل الإعجابات من Firebase:", error);
+      }
+  }
+  
+  async function toggleLike(starId) {
+      if (!lastTouchedStar) return;
+      
+      const starIdStr = starId.toString();
+      const userId = currentUser.uid;
+      
+      try {
+          const starLikes = cachedLikes.get(starIdStr) || {};
+          
+          if (starLikes[userId]) {
+              delete starLikes[userId];
+              console.log(`❌ تم إزالة إعجاب المستخدم ${userId} بالرسالة ${starIdStr}`);
+          } else {
+              starLikes[userId] = {
+                  username: currentUser.displayName,
+                  timestamp: new Date().toISOString()
+              };
+              console.log(`❤️ تم إضافة إعجاب المستخدم ${userId} بالرسالة ${starIdStr}`);
+              
+              createMultipleHearts();
+          }
+          
+          await setDoc(doc(LIKES_COLLECTION, starIdStr), starLikes);
+          cachedLikes.set(starIdStr, starLikes);
+          
+          updateLikersButton(starIdStr);
+          
+      } catch (error) {
+          console.error("❌ فشل في تحديث الإعجاب:", error);
+      }
+  }
+  
+  function createMultipleHearts() {
+      const container = document.getElementById('flyingHeartsContainer');
+      const heartCount = 8;
+      
+      for (let i = 0; i < heartCount; i++) {
+          setTimeout(() => {
+              createFlyingHeart();
+          }, i * 100);
+      }
+  }
+  
+  function createFlyingHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'flying-heart';
+      heart.innerHTML = '❤️';
+      
+      const canvasRect = canvas.getBoundingClientRect();
+      const star = lastTouchedStar;
+      const cx = canvas.width/2, cy = canvas.height/2;
+      const starX = (star.x - camera.x) + cx;
+      const starY = (star.y - camera.y) + cy;
+      
+      heart.style.left = (canvasRect.left + starX) + 'px';
+      heart.style.top = (canvasRect.top + starY) + 'px';
+      
+      const tx = (Math.random() - 0.5) * 200;
+      const ty = -100 - Math.random() * 100;
+      
+      heart.style.setProperty('--tx', `${tx}px`);
+      heart.style.setProperty('--ty', `${ty}px`);
+      
+      document.getElementById('flyingHeartsContainer').appendChild(heart);
+      
+      setTimeout(() => {
+          if (heart.parentNode) {
+              heart.parentNode.removeChild(heart);
+          }
+      }, 1500);
+  }
+  
+  function updateLikersButton(starIdStr) {
+      if (!starIdStr || !cachedLikes.get(starIdStr)) {
+          likersControlBtn.innerText = `المعجبون (0)`;
+          return;
+      }
+      
+      const likesCount = Object.keys(cachedLikes.get(starIdStr)).length;
+      likersControlBtn.innerText = `المعجبون (${likesCount})`;
+  }
+  
+  async function showLikersModal(starIdStr) {
+      if (!starIdStr || !cachedLikes.get(starIdStr)) {
+          likersList.innerHTML = '<div>لا يوجد معجبين بعد</div>';
+      } else {
+          const starLikes = cachedLikes.get(starIdStr);
+          const likersHTML = Object.values(starLikes)
+              .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+              .map(like => `<div>${like.username} - ${new Date(like.timestamp).toLocaleString('ar-EG')}</div>`)
+              .join('');
+          likersList.innerHTML = likersHTML;
+      }
+      
+      likersModal.style.display = 'block';
+  }
+
+  function updatePinButtonText(isPinned) {
+      pinMessageControlBtn.innerText = isPinned ? 'إلغاء التثبيت ❌' : 'تثبيت الرسالة 📌';
+  }
+
+  function toggleControlButtons(show) {
+    if (show && lastTouchedStar && lastTouchedStar.hasMessage) {
+        controlButtons.style.display = 'flex';
+        updateLikersButton(lastTouchedStar.id.toString());
+        
+        const existingDiv = document.querySelector(`.starMessage[data-star-id="${lastTouchedStar.id}"]`);
+        const isPinned = existingDiv && existingDiv.classList.contains('pinned');
+        updatePinButtonText(isPinned);
+        
+        updateFavoriteButtonState();
+        updateReplyCount();
+        
+        replyControlBtn.style.display = 'block';
+        
+        // إظهار أزرار التعديل والحذف فقط لصاحب الرسالة
+        if (lastTouchedStar.uid === currentUser.uid) {
+            deleteMessageControlBtn.style.display = 'block';
+            editMessageControlBtn.style.display = 'block';
+        } else {
+            deleteMessageControlBtn.style.display = 'none';
+            editMessageControlBtn.style.display = 'none';
+        }
+        
+        addFavoriteControlBtn.style.display = 'block';
+    } else {
+        controlButtons.style.display = 'none';
+    }
+}
+
+async function updateReplyCount() {
+    if (!lastTouchedStar) return;
+    
+    try {
+        const replies = await loadReplies(lastTouchedStar.id.toString());
+        replyCount.innerText = replies.length;
+    } catch (error) {
+        console.error("❌ فشل تحميل عدد الردود:", error);
+        replyCount.innerText = "0";
+    }
+}
+
+function updateFavoriteButtonState() {
+    if (!lastTouchedStar || !lastTouchedStar.uid) {
+        addFavoriteControlBtn.style.display = 'none';
+        return;
+    }
+    
+    addFavoriteControlBtn.style.display = 'block';
+    
+    const isFavorite = currentUser.favorites.includes(lastTouchedStar.id);
+    
+    if (isFavorite) {
+        addFavoriteControlBtn.innerText = 'إزالة من المفضلة';
+        addFavoriteControlBtn.classList.add('favorite');
+    } else {
+        addFavoriteControlBtn.innerText = 'إضافة للمفضلة';
+        addFavoriteControlBtn.classList.remove('favorite');
+    }
+}
+
+// دالة حذف الرسالة (لصاحبها فقط)
+deleteMessageControlBtn.onclick = async () => {
+    if (!lastTouchedStar) {
+        showError("يرجى لمس نجمة تحتوي على رسالة أولاً.");
+        return;
+    }
+    
+    if (lastTouchedStar.uid !== currentUser.uid) {
+        showError("يمكنك حذف رسائلك فقط.");
+        return;
+    }
+    
+    const starId = lastTouchedStar.id.toString();
+    const starTitle = lastTouchedStar.title || 'رسالة';
+    
+    if (!confirm(`هل أنت متأكد من حذف "${starTitle}"؟`)) {
+        return;
+    }
+    
+    try {
+        await deleteDoc(doc(MESSAGES_COLLECTION, starId));
+        cachedMessages.delete(starId);
+        bindMessagesToStars(cachedMessages);
+        showSuccess(`تم حذف "${starTitle}" بنجاح`);
+        toggleControlButtons(false);
+    } catch (error) {
+        console.error("❌ فشل حذف الرسالة:", error);
+        showError("فشل حذف الرسالة. يرجى المحاولة لاحقاً.");
+    }
+};
+
+// دالة تعديل الرسالة (لصاحبها فقط)
+editMessageControlBtn.onclick = () => {
+    if (!lastTouchedStar) {
+        showError("يرجى لمس نجمة تحتوي على رسالة أولاً.");
+        return;
+    }
+    
+    if (lastTouchedStar.uid !== currentUser.uid) {
+        showError("يمكنك تعديل رسائلك فقط.");
+        return;
+    }
+    
+    activeStar = lastTouchedStar;
+    messageInput.value = lastTouchedStar.message || "";
+    titleInput.value = lastTouchedStar.title || "";
+    messageModal.style.display = "block";
+    
+    setTimeout(() => titleInput.focus(), 10);
+};
+
+addFavoriteControlBtn.onclick = async () => {
+    if (!lastTouchedStar) {
+        showError("يرجى لمس نجمة تحتوي على رسالة أولاً.");
+        return;
+    }
+    
+    const starId = lastTouchedStar.id.toString();
+    const starTitle = lastTouchedStar.title || 'رسالة';
+    
+    try {
+        const starIdNum = parseInt(starId);
+        const isAlreadyFavorite = currentUser.favorites.includes(starIdNum);
+        
+        if (isAlreadyFavorite) {
+            // إزالة من المفضلة
+            currentUser.favorites = currentUser.favorites.filter(id => id !== starIdNum);
+            addFavoriteControlBtn.innerText = 'إضافة للمفضلة';
+            addFavoriteControlBtn.classList.remove('favorite');
+            showSuccess(`تم إزالة ${starTitle} من قائمة المفضلة.`);
+        } else {
+            // إضافة إلى المفضلة
+            currentUser.favorites.push(starIdNum);
+            addFavoriteControlBtn.innerText = 'إزالة من المفضلة';
+            addFavoriteControlBtn.classList.add('favorite');
+            showSuccess(`تمت إضافة ${starTitle} إلى قائمة المفضلة.`);
+        }
+        
+        // حفظ في localStorage أولاً (دائماً يعمل)
+        saveUserToLocal();
+        
+        // محاولة الحفظ في Firebase (إذا فشل، نستمر مع localStorage)
+        try {
+            await setDoc(doc(FAVORITES_COLLECTION, DEVICE_UUID), {
+                favorites: currentUser.favorites,
+                updatedAt: new Date().toISOString(),
+                userName: currentUser.displayName
+            });
+            console.log(`✅ تم حفظ المفضلة في Firebase`);
+        } catch (firebaseError) {
+            console.warn("⚠️ تم الحفظ في localStorage فقط بسبب:", firebaseError.message);
+        }
+        
+        updateMessageCounts();
+        
+    } catch (error) {
+        console.error("❌ فشل تحديث قائمة المفضلة:", error);
+        console.error("تفاصيل الخطأ:", error.message, error.code);
+        
+        // في حالة أي خطأ، نعتمد على localStorage فقط
+        showSuccess(isAlreadyFavorite ? 
+            `تم إزالة ${starTitle} من قائمة المفضلة (محلياً).` : 
+            `تمت إضافة ${starTitle} إلى قائمة المفضلة (محلياً).`
+        );
+        updateMessageCounts();
+    }
+};
+
+pinMessageControlBtn.onclick = () => {
+    if (!lastTouchedStar) {
+        showError("يرجى لمس نجمة أولاً.");
+        return;
+    }
+
+    if (!lastTouchedStar.hasMessage) {
+          showError("هذه النجمة لا تحتوي على رسالة لتثبيتها.");
+          return;
+    }
+    
+    let alreadyPinned = false;
+    document.querySelectorAll('.starMessage.pinned').forEach(div => {
+        const pinnedStarId = parseInt(div.dataset.starId);
+        if (pinnedStarId !== lastTouchedStar.id) {
+            div.classList.remove('pinned');
+            const oldStar = STATIC_STARS_MAP.get(pinnedStarId);
+            if (oldStar) {
+                hideStarMessageDiv(div, oldStar);  
+            } else {
+                div.remove();
+            }
+        } else {
+           alreadyPinned = true;
+        }
+    });
+    
+    let existingDiv = document.querySelector(`.starMessage[data-star-id="${lastTouchedStar.id}"]`);
+    
+    if (!existingDiv) {
+        showStarMessage(lastTouchedStar);
+        existingDiv = document.querySelector(`.starMessage[data-star-id="${lastTouchedStar.id}"]`);
+    }
+    
+    if (existingDiv) {
+        const isPinned = existingDiv.classList.toggle('pinned');
+        
+        updatePinButtonText(isPinned);
+        
+        if (isPinned) {
+            clearTimeout(lastTouchedStar.hideTimeout);  
+        } else {
+            clearTimeout(lastTouchedStar.hideTimeout);
+            lastTouchedStar.hideTimeout = setTimeout(() => hideStarMessageDiv(existingDiv, lastTouchedStar), 5000);  
+        }
+    }
+};
+
+likeControlBtn.onclick = () => {
+    if (!lastTouchedStar) {
+        showError("يرجى لمس نجمة أولاً.");
+        return;
+    }
+    
+    if (!lastTouchedStar.hasMessage) {
+        showError("لا يمكن الإعجاب بنجمة لا تحتوي على رسالة.");
+        return;
+    }
+    
+    toggleLike(lastTouchedStar.id);
+};
+
+likersControlBtn.onclick = () => {
+    if (!lastTouchedStar) {
+        showError("يرجى لمس نجمة أولاً.");
+        return;
+    }
+    
+    if (!lastTouchedStar.hasMessage) {
+        showError("لا يوجد معجبين بنجمة لا تحتوي على رسالة.");
+        return;
+    }
+    
+    showLikersModal(lastTouchedStar.id.toString());
+};
+
+favoritesListControlBtn.onclick = async () => {
+    await showFavoritesModal();
+};
+
+replyControlBtn.onclick = () => {
+    if (!lastTouchedStar) {
+        showError("يرجى لمس نجمة أولاً.");
+        return;
+    }
+    
+    if (!lastTouchedStar.hasMessage) {
+        showError("لا يمكن الرد على نجمة لا تحتوي على رسالة.");
+        return;
+    }
+    
+    showReplyModal(lastTouchedStar.id.toString());
+};
+
+let isPanelOpen = false;
+
+fabButton.onclick = (e) => {
+    e.stopPropagation();
+    isPanelOpen = !isPanelOpen;
+    if (isPanelOpen) {
+        userPanel.classList.add('open');
+        fabButton.innerText = '✖️';
+    } else {
+        userPanel.classList.remove('open');
+        fabButton.innerText = '⚙️';
+    }
+};
+
+function closePanel() {
+    if (isPanelOpen) {
+        userPanel.classList.remove('open');
+        fabButton.innerText = '⚙️';
+        isPanelOpen = false;
+    }
+}
+
+function setupMessageTypeOptions() {
+    const messageTypeOptions = document.querySelectorAll('.message-type-option');
+    const messageStatusOptions = document.querySelectorAll('.message-status-option');
+    
+    messageTypeOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            const type = e.currentTarget.dataset.type;
+            
+            messageTypeOptions.forEach(opt => {
+                opt.classList.remove('active');
+            });
+            e.currentTarget.classList.add('active');
+            
+            navigationMode = type;
+            resetStarNavigation();
+            console.log(`✅ تم تغيير وضع التنقل إلى: ${type}`);
+        });
+    });
+    
+    messageStatusOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            const status = e.currentTarget.dataset.status;
+            
+            e.currentTarget.closest('.message-status-options').querySelectorAll('.message-status-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            e.currentTarget.classList.add('active');
+            
+            messageStatusFilter = status;
+            resetStarNavigation();
+            console.log(`✅ تم تغيير فلتر حالة الرسائل إلى: ${status}`);
+        });
+    });
+}
+
+async function loadFavoritesList() {
+    try {
+        // أولاً نحاول تحميل من Firebase
+        const favoriteDoc = await getDoc(doc(FAVORITES_COLLECTION, currentUser.uid));
+        if (favoriteDoc.exists()) {
+            currentUser.favorites = favoriteDoc.data().favorites || [];
+            saveUserToLocal();
+            console.log("✅ تم تحميل المفضلة من Firebase");
+        } else {
+            // إذا لم توجد في Firebase، نستخدم localStorage
+            console.log("ℹ️ استخدام المفضلة من localStorage");
+        }
+    } catch (error) {
+        console.error("❌ فشل تحميل قائمة المفضلة من Firebase، استخدام localStorage:", error);
+        // في حالة الخطأ، نعتمد على localStorage الموجود
+    }
+}
+
+// دالة لتنظيف المفضلة من الرسائل غير الموجودة
+function cleanupFavorites() {
+    const originalLength = currentUser.favorites.length;
+    
+    // تصفية المفضلة للحفاظ على النجوم الموجودة فقط
+    currentUser.favorites = currentUser.favorites.filter(starId => {
+        const star = STATIC_STARS_MAP.get(starId);
+        return star && star.hasMessage; // إرجاع true فقط إذا النجمة موجودة ولها رسالة
+    });
+    
+    const cleanedLength = currentUser.favorites.length;
+    
+    if (cleanedLength < originalLength) {
+        console.log(`🧹 تم تنظيف المفضلة: ${originalLength - cleanedLength} رسالة غير موجودة تمت إزالتها`);
+        saveUserToLocal();
+        
+        // تحديث Firebase أيضاً إذا أمكن
+        try {
+            setDoc(doc(FAVORITES_COLLECTION, currentUser.uid), {
+                favorites: currentUser.favorites,
+                updatedAt: new Date().toISOString()
+            });
+        } catch (error) {
+            console.log("⚠️ تم التنظيف في localStorage فقط");
+        }
+    }
+    
+    return originalLength - cleanedLength;
+}
+
+async function showFavoritesModal() {
+    try {
+        // تنظيف المفضلة أولاً من الرسائل غير الموجودة
+        const removedCount = cleanupFavorites();
+        
+        const favoritesHTML = [];
+        
+        if (currentUser.favorites.length === 0) {
+            if (removedCount > 0) {
+                favoritesList.innerHTML = `<div>لا توجد رسائل في المفضلة<br><small>تم تنظيف ${removedCount} رسالة غير موجودة</small></div>`;
+            } else {
+                favoritesList.innerHTML = '<div>لا توجد رسائل في المفضلة</div>';
+            }
+        } else {
+            for (const starId of currentUser.favorites) {
+                const star = STATIC_STARS_MAP.get(starId);
+                if (star && star.hasMessage) {
+                    favoritesHTML.push(`
+                        <div>
+                            <strong>${star.title || 'رسالة بدون عنوان'}</strong><br>
+                            <small>${star.message.substring(0, 50)}${star.message.length > 50 ? '...' : ''}</small>
+                            <div class="favorite-actions">
+                                <button class="remove-favorite-btn" data-id="${starId}">إزالة</button>
+                            </div>
+                        </div>
+                    `);
+                }
+            }
+            
+            favoritesList.innerHTML = favoritesHTML.join('');
+            
+            // إضافة رسالة إذا تم تنظيف بعض الرسائل
+            if (removedCount > 0) {
+                favoritesList.innerHTML = `
+                    <div style="background: #333; padding: 10px; border-radius: 5px; margin-bottom: 10px; text-align: center;">
+                        <small>تم تنظيف ${removedCount} رسالة غير موجودة تلقائياً</small>
+                    </div>
+                    ${favoritesList.innerHTML}
+                `;
+            }
+            
+            document.querySelectorAll('.remove-favorite-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const starId = parseInt(e.target.dataset.id);
+                    await removeFavorite(starId);
+                };
+            });
+        }
+        
+        favoritesModal.style.display = 'block';
+        
+    } catch (error) {
+        console.error("❌ فشل تحميل قائمة المفضلة:", error);
+        showError("حدث خطأ أثناء تحميل قائمة المفضلة.");
+    }
+}
+
+async function removeFavorite(starId) {
+    try {
+        // تصفية المفضلة
+        currentUser.favorites = currentUser.favorites.filter(id => id !== starId);
+        
+        // حفظ في localStorage أولاً
+        saveUserToLocal();
+        
+        // محاولة الحفظ في Firebase
+        try {
+            await setDoc(doc(FAVORITES_COLLECTION, currentUser.uid), {
+                favorites: currentUser.favorites,
+                updatedAt: new Date().toISOString(),
+                userName: currentUser.displayName
+            });
+        } catch (firebaseError) {
+            console.warn("⚠️ تم الحفظ في localStorage فقط بسبب:", firebaseError.message);
+        }
+        
+        await showFavoritesModal();
+        
+        if (lastTouchedStar && lastTouchedStar.id === starId) {
+            updateFavoriteButtonState();
+        }
+        
+        updateMessageCounts();
+        
+        showSuccess("تمت إزالة الرسالة من المفضلة.");
+        
+    } catch (error) {
+        console.error("❌ فشل إزالة المفضلة:", error);
+        
+        // في حالة الخطأ، نعتمد على localStorage
+        showSuccess("تمت إزالة الرسالة من المفضلة (محلياً).");
+        updateMessageCounts();
+    }
+}
+
+closeFavoritesBtn.onclick = () => {
+    favoritesModal.style.display = 'none';
+};
+
+async function updateUI() { 
+    loadUserFromLocal();
+    
+    // تهيئة الخريطة الثابتة أولاً
+    initializeStaticMap();
+    
+    await loadAndCacheStars();  
+    await loadAndCacheLikes();
+    await loadFavoritesList();
+    // تنظيف المفضلة من الرسائل غير الموجودة
+    cleanupFavorites();
+    
+    startMessagesListener();
+    startLikesListener();
+    startRepliesListener();
+    
+    resetStarNavigation();
+    
+    fabButton.style.display = 'block';  
+    userPanel.style.display = 'flex';
+    navigateStarBtn.style.display = 'block';
+    controlButtons.style.display = 'none';
+    
+    setupMessageTypeOptions();
+    
+    updateMessageCounts();
+}
+
+closeLikersBtn.onclick = () => {
+    likersModal.style.display = 'none';
+};
+
+function hideStarMessageDiv(div, star) {
+    if (div && div.classList && !div.classList.contains('pinned')) {
+        div.style.opacity = 0;
+        setTimeout(() => {  
+            div.remove();  
+            star.showing = false;  
+            
+            const anyMessageOpen = Array.from(STATIC_STARS_MAP.values()).some(s => s.showing && s.hasMessage);
+            if (!anyMessageOpen) {
+                fabButton.style.display = 'block';
+            }
+            
+        }, 300);
+        updatePinButtonText(false);
+        document.removeEventListener('pointerdown', div.outsideClick);
+        
+        if (parseInt(div.dataset.starId) === lastTouchedStar?.id) {
+            toggleControlButtons(false);
+        }
+    }
+}
+
+async function loadReplies(starId) {
+    try {
+        const replyDoc = await getDoc(doc(REPLIES_COLLECTION, starId));
+        return replyDoc.exists() ? replyDoc.data().replies || [] : [];
+    } catch (error) {
+        console.error("❌ فشل تحميل الردود:", error);
+        return [];
+    }
+}
+
+async function saveReply(starId, replyText) {    
+    try {
+        const replyDoc = await getDoc(doc(REPLIES_COLLECTION, starId));
+        const existingReplies = replyDoc.exists() ? replyDoc.data().replies || [] : [];
+        
+        const newReply = {
+            id: `reply_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            text: replyText,
+            author: currentUser.displayName,
+            authorId: currentUser.uid,
+            timestamp: new Date().toISOString()
+        };
+        
+        const updatedReplies = [...existingReplies, newReply];
+        
+        await setDoc(doc(REPLIES_COLLECTION, starId), {
+            replies: updatedReplies,
+            lastUpdated: new Date().toISOString()
+        });
+        
+        return newReply;
+    } catch (error) {
+        console.error("❌ فشل حفظ الرد:", error);
+        throw error;
+    }
+}
+
+async function showReplyModal(starId) {
+    if (!starId) return;
+    
+    try {
+        const replies = await loadReplies(starId);
+        
+        if (replies.length === 0) {
+            repliesList.innerHTML = '<div class="reply-item">لا توجد ردود بعد</div>';
+        } else {
+repliesList.innerHTML = replies
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .map(reply => `
+        <div class="reply-item">
+            <div class="reply-author">${reply.author}</div>
+            <div class="reply-text">${reply.text}</div>
+            <div style="font-size: 12px; color: #888; margin-top: 5px;">
+                ${formatArabicDate(reply.timestamp)}
+            </div>
+        </div>
+    `).join('');
+        }
+        
+        replyInput.value = '';
+        
+        replyModal.style.display = 'block';
+        
+    } catch (error) {
+        console.error("❌ فشل تحميل الردود:", error);
+        showError("حدث خطأ أثناء تحميل الردود. يرجى المحاولة لاحقاً.");
+    }
+}
+
+sendReplyBtn.onclick = async () => {
+    const replyText = replyInput.value.trim();
+    
+    if (!replyText) {
+        showError("يرجى كتابة رد قبل الإرسال.");
+        return;
+    }
+    
+    if (!lastTouchedStar) {
+        showError("لم يتم تحديد رسالة للرد عليها.");
+        return;
+    }
+    
+    try {
+        sendReplyBtn.disabled = true;
+        sendReplyBtn.innerText = 'جاري الإرسال...';
+        
+        await saveReply(lastTouchedStar.id.toString(), replyText);
+        
+        await showReplyModal(lastTouchedStar.id.toString());
+        
+        await updateReplyCount();
+        
+        sendReplyBtn.disabled = false;
+        sendReplyBtn.innerText = 'إرسال الرد';
+        
+    } catch (error) {
+        showError("فشل إرسال الرد. يرجى المحاولة لاحقاً.");
+        sendReplyBtn.disabled = false;
+        sendReplyBtn.innerText = 'إرسال الرد';
+    }
+};
+
+closeReplyBtn.onclick = () => {
+    replyModal.style.display = 'none';
+};
+
+replyModal.onclick = (e) => {
+    if (e.target === replyModal) {
+        replyModal.style.display = 'none';
+    }
+};
+
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+let DPR=window.devicePixelRatio||1;
+function resize(){canvas.width=innerWidth*DPR;canvas.height=innerHeight*DPR;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';}
+window.addEventListener('resize',resize);resize();
+
+const camera={x:0,y:0,tx:0,ty:0};
+let isAutoMoving = false;
+
+function drawMessageConnections(time) {
+    const w = canvas.width, h = canvas.height;
+    const cx = w / 2, cy = h / 2;
+    const canvasRect = canvas.getBoundingClientRect();
+    
+    const messageDivs = document.querySelectorAll('.starMessage');
+    
+    messageDivs.forEach(div => {
+        if (div.style.opacity === '0' || div.style.display === 'none') return;
+
+        const starId = parseInt(div.dataset.starId);
+        const star = STATIC_STARS_MAP.get(starId);
+
+        if (star) {
+            const star_sx = (star.x - camera.x) + cx;
+            const star_sy = (star.y - camera.y) + cy;
+            
+            const divRect = div.getBoundingClientRect();
+            const div_center_x = (divRect.left + divRect.width / 2 - canvasRect.left) * DPR;
+            const div_center_y = (divRect.top + divRect.height / 2 - canvasRect.top) * DPR;
+
+            const pulse = Math.sin(time / 400) * 0.2 + 0.8;
+            const alpha = parseFloat(div.style.opacity || 1) * pulse * 0.6;
+            
+            ctx.beginPath();
+            ctx.moveTo(star_sx, star_sy);
+            ctx.lineTo(div_center_x, div_center_y);
+            ctx.strokeStyle = `rgba(135, 206, 235, ${alpha * 0.2})`;
+            ctx.lineWidth = 4 * DPR;
+            ctx.setLineDash([4 * DPR, 4 * DPR]);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(star_sx, star_sy);
+            ctx.lineTo(div_center_x, div_center_y);
+            ctx.strokeStyle = `rgba(135, 206, 235, ${alpha})`;
+            ctx.lineWidth = 1.5 * DPR;
+            ctx.setLineDash([4 * DPR, 4 * DPR]);
+            ctx.stroke();
+            
+            ctx.setLineDash([]); 
+        }
+    });
+}
+
+function draw(time){
+  const w=canvas.width,h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+  const cx=w/2,cy=h/2;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font=12*DPR+'px monospace';
+  
+  drawMessageConnections(time); 
+
+  // رسم النجوم المرئية فقط
+  const visibleStars = loadVisibleStars();
+  
+  for(const s of visibleStars){
+    const sx=(s.x-camera.x)+cx;
+    const sy=(s.y-camera.y)+cy;
+    if(sx<-50||sx>w+50||sy<-50||sy>h+50)continue;
+    
+    if(s.id === 0 && moonImageLoaded) {
+        const moonSize = 120 * DPR;
+        ctx.drawImage(moonImage, sx - moonSize/2, sy - moonSize/2, moonSize, moonSize);
+        
+        if(s.hasMessage) {
+            ctx.fillStyle = s.opened ? 'orange' : '#0f0';
+            const rawText = s.title || s.id.toString();
+            const text = rawText.substring(0, 15);
+            ctx.fillText(text, sx, sy - moonSize/2 - 15*DPR);
+        }
+        continue;
+    }
+    
+    const pulse=Math.sin(time*s.pulseSpeed/1000 + s.phase)*0.3 + 0.7;
+    const glow=s.size*(5+pulse*3)*DPR;
+    const brightness=s.brightness*pulse;
+    ctx.save();
+    const grad=ctx.createRadialGradient(sx,sy,0,sx,sy,glow);
+    grad.addColorStop(0,`rgba(255,255,255,${0.8*brightness})`);
+    grad.addColorStop(0.3,`rgba(255,255,255,${0.4*brightness})`);
+    grad.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(sx,sy,glow,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.beginPath();
+    
+    let starColor = '#fff';  
+    
+    if (s.hasMessage) {
+        starColor = s.opened ? 'orange' : '#0f0';  
+    }  
+    
+    ctx.fillStyle = starColor;
+    ctx.globalAlpha=brightness; ctx.arc(sx,sy,s.size*DPR,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+    
+    let textColor = '#fff';  
+    
+    if (s.hasMessage) {
+        textColor = starColor;
+    } else {
+        textColor = '#fff';
+    }
+
+    ctx.fillStyle = s.title ? textColor : '#fff';  
+    
+    const rawText = s.title || s.id.toString();
+    const text = rawText.substring(0, 15);  
+    
+    ctx.fillText(text,sx,sy-15*DPR);
+  }
+}
+
+function update(dt){
+    if (isAutoMoving) {
+        const smoothing = 0.05;
+        const dx = camera.tx - camera.x;
+        const dy = camera.ty - camera.y;
+        
+        if (Math.hypot(dx, dy) < 10) { 
+            camera.x = camera.tx;
+            camera.y = camera.ty;
+            isAutoMoving = false;
+        } else {
+            camera.x += dx * smoothing * 60 * dt;
+            camera.y += dy * smoothing * 60 * dt;
+        }
+    }
+}
+
+let currentStarIndex = -1;
+
+function resetStarNavigation() {
+    currentStarIndex = -1;
+    console.log("🔄 تم إعادة تعيين فهرس التنقل بين النجوم");
+}
+
+navigateStarBtn.onclick = () => {
+    let starsWithMessage = allStarsWithMessages;
+    
+    switch (navigationMode) {
+        case 'favorites':
+            starsWithMessage = starsWithMessage.filter(s => 
+    currentUser.favorites.includes(s.id)
+);
+            break;
+    }
+    
+    if (messageStatusFilter !== 'all') {
+        starsWithMessage = starsWithMessage.filter(s => {
+            const isRead = currentUser.readStarIds[s.id] || false;
+            return messageStatusFilter === 'read' ? isRead : !isRead;
+        });
+    }
+    
+    starsWithMessage.sort((a, b) => a.id - b.id);
+    
+    if (starsWithMessage.length === 0) {
+        showError("لا توجد رسائل تطابق معايير البحث الحالية.");
+        return;
+    }
+    
+    if (currentStarIndex >= starsWithMessage.length || currentStarIndex < 0) {
+        resetStarNavigation();
+    }
+    
+    currentStarIndex = (currentStarIndex + 1) % starsWithMessage.length;
+    
+    const targetStar = starsWithMessage[currentStarIndex];
+    
+    camera.tx = targetStar.x;
+    camera.ty = targetStar.y;
+    
+    isAutoMoving = true;
+    
+    lastTouchedStar = targetStar;
+    showStarMessage(targetStar);
+    
+    if (targetStar.hasMessage && !targetStar.opened) {
+        targetStar.opened = true;
+        if (!currentUser.readStarIds[targetStar.id]) {
+            currentUser.readStarIds[targetStar.id] = true;
+            saveUserToLocal();
+        }
+    }
+    
+    console.log(`📍 التنقل إلى النجمة ${currentStarIndex + 1} من ${starsWithMessage.length} (ID: ${targetStar.id})`);
+};
+
+let isDragging = false;
+let lastPointerX, lastPointerY;
+const DRAG_SENSITIVITY = 1.0; 
+
+canvas.addEventListener('pointerdown', e => {
+    if (e.target.closest('#navigateStarBtn, #messageModal, #userPanel, #fabButton, #likersModal, #controlButtons, #favoritesModal, #replyModal')) {
+        isDragging = false;
+        return;
+    }
+    
+    isDragging = true;
+    lastPointerX = e.clientX;
+    lastPointerY = e.clientY;
+    
+    isAutoMoving = false;
+
+    e.preventDefault(); 
+    canvas.setPointerCapture(e.pointerId); 
+});
+
+canvas.addEventListener('pointermove', e => {
+    if (!isDragging) return;
+    
+    const dx = e.clientX - lastPointerX;
+    const dy = e.clientY - lastPointerY;
+
+    camera.x -= dx * DRAG_SENSITIVITY * DPR; 
+    camera.y -= dy * DRAG_SENSITIVITY * DPR;
+    camera.tx = camera.x;
+    camera.ty = camera.y;
+
+    lastPointerX = e.clientX;
+    lastPointerY = e.clientY;
+});
+
+canvas.addEventListener('pointerup', () => {
+    isDragging = false;
+});
+
+titleInput.addEventListener('input', () => {
+  titleInput.value = titleInput.value.slice(0, 15);
+});
+
+function bindMessagesToStars(messagesCache){
+  console.log(`🔗 جاري ربط ${messagesCache.size} رسالة بالنجوم...`);
+  
+  // إعادة تعيين جميع النجوم
+  STATIC_STARS_MAP.forEach(star => {
+    star.message = null;
+    star.hasMessage = false;
+    star.title = null;
+    star.opened = false;
+    star.docId = null;  
+    star.uid = null;  
+    star.isPinned = false;  
+  });
+  
+  allStarsWithMessages = []; // إعادة تعيين القائمة
+  
+  const readStarIds = currentUser.readStarIds || {};
+
+  let matchedCount = 0;
+  
+  messagesCache.forEach((data, id) => {
+    const starId = parseInt(id);
+    const star = STATIC_STARS_MAP.get(starId);  
+    
+    if (star) {
+      star.message = data.text || null;  
+      star.hasMessage = !!data.text;
+      star.title = data.title || null;  
+      star.docId = id.toString();  
+      star.uid = data.uid || null;  
+      star.opened = !!readStarIds[starId];
+      
+      // إضافة إلى القائمة المنفصلة
+      allStarsWithMessages.push(star);
+      matchedCount++;
+    }
+  });
+  
+  console.log(`✅ تم ربط ${matchedCount} رسالة بنجوم موجودة في القائمة المنفصلة`);
+  
+  resetStarNavigation(); 
+  draw(performance.now());
+  
+  updateMessageCounts();
+}
+
+function updateMessageCounts() {
+    const allCount = allStarsWithMessages.length;
+    const favoritesCount = allStarsWithMessages.filter(s => 
+    currentUser.favorites.includes(s.id)
+).length;
+    
+    allMessagesCount.innerText = allCount;
+    favoritesMessagesCount.innerText = favoritesCount;
+}
+
+async function loadAndCacheStars(){
+  try {
+    console.log("🚀 جاري تحميل جميع الرسائل من Firebase...");
+    const querySnapshot = await getDocs(MESSAGES_COLLECTION);
+    
+    cachedMessages.clear();
+    querySnapshot.forEach((doc) => {
+        cachedMessages.set(doc.id, doc.data());
+    });
+    
+    console.log(`✅ تم تحميل ${cachedMessages.size} رسالة من Firebase`);
+    
+    bindMessagesToStars(cachedMessages);  
+
+  } catch (error) {
+    console.error("❌ فشل تحميل النجوم من Firebase:", error);
+  }
+}
+
+canvas.addEventListener('click', e=>{
+  if (e.target.closest('#controlButtons')) {
+      return;
+  }
+  
+  isAutoMoving = false;
+  closePanel();  
+
+  const rect=canvas.getBoundingClientRect();
+  const x=(e.clientX-rect.left)*DPR;
+  const y=(e.clientY-rect.top)*DPR;
+  const cx=canvas.width/2,cy=canvas.height/2;
+  
+  let nearest=null,minDist=15*DPR;
+  
+  // البحث في النجوم المرئية فقط
+  const visibleStars = loadVisibleStars();
+  
+  for(const s of visibleStars){
+    const sx=(s.x-camera.x)+cx;
+    const sy=(s.y-camera.y)+cy;
+    const d=Math.hypot(sx-x,sy-y);
+    if(d<minDist){nearest=s;minDist=d;}
+  }
+  
+  if(nearest){
+  lastTouchedStar = nearest;  
+  
+  document.querySelectorAll('.starMessage').forEach(div => {
+      if (div.classList.contains('pinned') && parseInt(div.dataset.starId) !== nearest.id) return;
+      
+      const starId = parseInt(div.dataset.starId);
+      const star = STATIC_STARS_MAP.get(starId);
+      if (star) hideStarMessageDiv(div, star);
+  });
+  
+  fabButton.style.display = 'none';
+  
+  toggleControlButtons(true);
+  
+  updateLikersButton(nearest.id.toString());
+  
+  const existingDiv = document.querySelector(`.starMessage[data-star-id="${nearest.id}"]`);
+  updatePinButtonText(existingDiv && existingDiv.classList.contains('pinned'));
+  
+  if(!nearest.hasMessage){
+    activeStar=nearest;
+    messageInput.value="";
+    titleInput.value="";
+    messageModal.style.display="block";
+    
+    setTimeout(() => titleInput.focus(), 10);
+    
+  } else if(!nearest.showing){
+    showStarMessage(nearest);
+    
+    if (nearest.hasMessage && !nearest.opened) {
+            nearest.opened = true;  
+
+            if (!currentUser.readStarIds[nearest.id]) {
+                currentUser.readStarIds[nearest.id] = true;
+                saveUserToLocal();
+            }
+    }
+    
+    const currentDiv = document.querySelector(`.starMessage[data-star-id="${nearest.id}"]`);
+    updatePinButtonText(currentDiv && currentDiv.classList.contains('pinned'));
+  }
+} else {
+  toggleControlButtons(false);
+  
+  const anyMessageOpen = Array.from(STATIC_STARS_MAP.values()).some(s => s.showing && s.hasMessage);
+  if (!anyMessageOpen) {
+      fabButton.style.display = 'block';
+  }
+}
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#controlButtons') && 
+        !e.target.closest('canvas') && 
+        !e.target.closest('.starMessage') &&
+        !e.target.closest('#userPanel') &&
+        !e.target.closest('#fabButton') &&
+        !e.target.closest('#likersModal') &&
+        !e.target.closest('#favoritesModal') &&
+        !e.target.closest('#replyModal')) {
+        toggleControlButtons(false);
+    }
+});
+
+sendBtn.onclick = async () => {
+  sendBtn.disabled = true;
+
+  if (activeStar) {
+    const messageText = messageInput.value.trim();
+    const titleText = titleInput.value.trim();
+    const starId = activeStar.id.toString();  
+
+    const title = titleText || 'رسالة زائر';
+
+    if (messageText === "") {
+        if (activeStar.hasMessage) {
+              try {
+                await deleteDoc(doc(MESSAGES_COLLECTION, starId));
+                console.log("✅ تم حذف الرسالة من فايبربيس بعد مسح المحتوى:", starId);
+                
+                cachedMessages.delete(starId);
+                bindMessagesToStars(cachedMessages);  
+
+              } catch (e) {
+                console.error("❌ خطأ أثناء الحذف من فايبربيس:", e);
+                showError("فشل حذف الرسالة. تأكد من استمرار الاتصال.");
+              }
+        }
+        
+        activeStar.message = null;
+        activeStar.hasMessage = false;
+        activeStar.title = null;
+        activeStar.showing = false;
+        activeStar.uid = null;
+        activeStar.docId = null;  
+        console.log("⚠️ تم إلغاء/حذف الرسالة.");
+    } else {
+      try {
+        const newMessageData = {
+            title: title,  
+            userName: currentUser.displayName,  
+            text: messageText,  
+            uid: currentUser.uid,  
+            updatedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString()
+        };
+        
+        await setDoc(doc(MESSAGES_COLLECTION, starId), newMessageData);
+        
+        console.log(`✅ تم حفظ الرسالة في فايبربيس للمفتاح: ${starId}`);
+        
+        cachedMessages.set(starId, newMessageData);
+        
+        activeStar.opened = true;
+        
+        bindMessagesToStars(cachedMessages);
+
+      } catch (e) {
+        console.error("❌ خطأ أثناء الحفظ في فايبربيس:", e);
+        showError("فشل حفظ الرسالة. تأكد من استمرار الاتصال.");
+      }
+    }
+    
+    sendBtn.disabled = false;
+    messageModal.style.display = "none";
+    activeStar = null;
+    lastTouchedStar = null;
+    
+    updateMessageCounts();
+  }
+};
+
+cancelBtn.onclick=()=>{messageModal.style.display="none";activeStar=null;};
+
+  function playMessageSound() {
+      const audio = new Audio('audio/open_message.mp3');
+      audio.play().catch(e => {
+          console.warn("❌ فشل تشغيل الصوت التلقائي:", e);
+      });
+  }
+  
+function showStarMessage(star){
+  document.querySelectorAll('.starMessage:not(.pinned)').forEach(div => {
+      const starId = parseInt(div.dataset.starId);
+      const s = STATIC_STARS_MAP.get(starId);
+      if (s) hideStarMessageDiv(div, s);
+  });
+  
+  const existingPinnedDiv = document.querySelector(`.starMessage[data-star-id="${star.id}"].pinned`);
+  if(star.showing && !existingPinnedDiv) {
+    return;
+  }
+  
+  if (!star.showing) {
+       playMessageSound();
+  }
+  
+  let div = document.querySelector(`.starMessage[data-star-id="${star.id}"]`);
+  
+  if (!div) {
+      star.showing = true;
+      
+      fabButton.style.display = 'none';
+      
+      const canvasRect = canvas.getBoundingClientRect();
+      const cx = canvas.width/2, cy = canvas.height/2;
+
+      div = document.createElement('div');
+      div.className = 'starMessage';
+      div.dataset.starId = star.id;  
+      
+      const ownerName = star.title || 'مجهول';  
+      div.innerText = star.message;  
+
+      
+      div.style.color = '#87CEEB';  
+
+      document.body.appendChild(div);
+      
+      let sx = (star.x - camera.x) + cx;
+      let sy = (star.y - camera.y) + cy;
+      const divRect = div.getBoundingClientRect();
+      let left = canvasRect.left + sx/DPR - divRect.width/2;
+      let top = canvasRect.top + sy/DPR - divRect.height - 10;
+      left = Math.max(5, Math.min(left, window.innerWidth - divRect.width - 5));
+      top = Math.max(5, Math.min(top, window.innerHeight - divRect.height - 5));
+      div.style.left = left + 'px';
+      div.style.top = top + 'px';
+
+      div.style.opacity = 1;
+      
+      div.outsideClick = function(e){  
+          if(!div.contains(e.target) && e.target !== navigateStarBtn && !e.target.closest('#controlButtons')){  
+              clearTimeout(star.hideTimeout);  
+              hideStarMessageDiv(div, star);  
+              document.removeEventListener('pointerdown', div.outsideClick);  
+          }  
+      };
+      document.addEventListener('pointerdown', div.outsideClick);
+  } else {
+      div.style.opacity = 1;
+      star.showing = true;
+      clearTimeout(star.hideTimeout);
+  }
+
+  if (!div.classList.contains('pinned')) {
+      clearTimeout(star.hideTimeout);
+      star.hideTimeout = setTimeout(() => hideStarMessageDiv(div, star), 5000);
+  }
+  
+  div.addEventListener('pointerdown', ()=>{  
+      if(!div.classList.contains('pinned')){  
+          clearTimeout(star.hideTimeout);  
+          star.hideTimeout = setTimeout(() => hideStarMessageDiv(div, star), 5000);  
+      }  
+  });
+}
+
+let last=performance.now();
+
+function loop(now){const dt=(now-last)/1000;last=now;update(dt);draw(now);requestAnimationFrame(loop);}
+
+function formatArabicDate(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const days = ['الأحد', 'الإثنين', 'ثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const dayName = days[date.getDay()];
+    
+    if (date.toDateString() === now.toDateString()) {
+        return `اليوم ${date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    else if (date.toDateString() === yesterday.toDateString()) {
+        return `أمس ${date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    else if ((now - date) < 7 * 24 * 60 * 60 * 1000) {
+        return `${dayName} ${date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+else {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${dayName} ${day}/${month}/${year} ${date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
+}
+}
+
+function showError(message) {
+    alert(`❌ ${message}`);
+}
+
+function showSuccess(message) {
+    alert(`✅ ${message}`);
+}
+
+// بدء التطبيق مباشرة
+updateUI();  
+camera.tx = camera.x;
+camera.ty = camera.y;
+
+requestAnimationFrame(loop);
+
+</script>
+</body>
+</html>
