@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8296425494322351" crossorigin="anonymous"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>StarWhispers (همسات النجوم)</title> 
@@ -9,38 +10,6 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     
 <style>
-/* شاشة التحميل */
-#loadingScreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    color: #0f0;
-    font-family: 'Cairo', sans-serif;
-}
-
-.loading-spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #333;
-    border-top: 5px solid #0f0;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 20px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 /* CSS الأساسي - تم تحسينه للجوال */
 html,body{
     height:100%;
@@ -806,11 +775,6 @@ canvas {
 </style>
 </head>
 <body>
-    <!-- شاشة التحميل -->
-<div id="loadingScreen">
-    <div class="loading-spinner"></div>
-    <div>جاري تحميل النجوم... ✨</div>
-</div>
 <canvas id="c" touch-action="none"></canvas>
 
 <!-- حاوية القلوب الطائرة -->
@@ -979,169 +943,6 @@ moonImage.onerror = function() {
 // 🔥 Real-time Listener للرسائل الجديدة
 import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// خريطة النجوم الثابتة
-const STATIC_STARS_MAP = new Map();
-// قائمة النجوم ذات الرسائل (منفصلة عن النجوم المرئية)
-let allStarsWithMessages = [];
-
-// دالة لتهيئة الخريطة الثابتة مع تباعد محسّن
-// دالة لتهيئة الخريطة الثابتة مع تباعد محسّن
-function initializeStaticMap() {
-    console.log("🗺️ جاري إنشاء الخريطة الثابتة للنجوم...");
-    
-    const loadingScreen = document.getElementById('loadingScreen');
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // إعدادات مختلفة للموبايل واللاب توب
-    let totalStars, baseMinDistance, distributionArea;
-    
-    if (isMobile) {
-        // إعدادات مخففة للموبايل
-        totalStars = 1500;
-        baseMinDistance = 150;
-        distributionArea = 15000;
-        console.log("📱 وضع الموبايل: عدد نجوم أقل لأداء أفضل");
-    } else {
-        // إعدادات كاملة لللاب توب
-        totalStars = 3000;
-        baseMinDistance = 200;
-        distributionArea = 25000;
-        console.log("💻 وضع اللاب توب: عدد نجوم كامل");
-    }
-    
-    const adjustedMinDistance = baseMinDistance * (DPR > 1 ? 1.2 : 1);
-    
-    // إخفاء شاشة التحميل بعد وقت قصير (حماية من التعليق)
-    const loadingTimeout = setTimeout(() => {
-        loadingScreen.style.display = 'none';
-        console.log("⏰ تم إخفاء شاشة التحميل تلقائياً بعد timeout");
-    }, 5000);
-    
-    let starsCreated = 0;
-    
-    function createStar(i) {
-        if (i >= totalStars) {
-            // انتهينا من إنشاء جميع النجوم
-            clearTimeout(loadingTimeout);
-            loadingScreen.style.display = 'none';
-            console.log(`✅ تم إنشاء ${STATIC_STARS_MAP.size} نجمة في الخريطة الثابتة`);
-            checkStarSpacing();
-            return;
-        }
-        
-        let x = (Math.random() - 0.5) * distributionArea;
-        let y = (Math.random() - 0.5) * distributionArea;
-        
-        let ok = true;
-        let tries = 0;
-        const maxTries = isMobile ? 20 : 30; // محاولات أقل على الموبايل
-        
-        // محاولة إيجاد موقع مناسب
-        while (tries < maxTries) {
-            ok = true;
-            
-            for (const existingStar of STATIC_STARS_MAP.values()) {
-                const dx = Math.abs(existingStar.x - x);
-                const dy = Math.abs(existingStar.y - y);
-                
-                if (dx < adjustedMinDistance && dy < adjustedMinDistance) {
-                    ok = false;
-                    break;
-                }
-            }
-            
-            if (ok) break;
-            
-            x = (Math.random() - 0.5) * distributionArea;
-            y = (Math.random() - 0.5) * distributionArea;
-            tries++;
-        }
-        
-        if (ok || tries >= maxTries) {
-            STATIC_STARS_MAP.set(i, {
-                id: i,
-                x: x,
-                y: y,
-                size: Math.max(0.5, Math.random()*2.0),
-                brightness: 0.4 + Math.random()*0.6,
-                pulseSpeed: 0.5 + Math.random()*1.5,
-                phase: Math.random()*Math.PI*2,
-                hasMessage: false,
-                message: null,
-                title: null,
-                uid: null,
-                opened: false,
-                showing: false,
-                docId: null,
-                isPinned: false
-            });
-        }
-        
-        starsCreated++;
-        
-        // تحديث التقدم
-        if (i % 100 === 0) {
-            const progress = Math.min(100, Math.round((starsCreated / totalStars) * 100));
-            console.log(`📊 تقدم إنشاء النجوم: ${progress}%`);
-        }
-        
-        // إنشاء النجم التالي في الـ event loop التالي
-        setTimeout(() => createStar(i + 1), 0);
-    }
-    
-    // بدء إنشاء النجوم
-    createStar(0);
-}
-
-// دالة للتحقق من التباعد بين النجوم
-function checkStarSpacing() {
-    let minDistance = Infinity;
-    let tooCloseCount = 0;
-    
-    STATIC_STARS_MAP.forEach((star1, id1) => {
-        STATIC_STARS_MAP.forEach((star2, id2) => {
-            if (id1 >= id2) return; // تجنب الحسابات المكررة
-            
-            const dx = Math.abs(star1.x - star2.x);
-            const dy = Math.abs(star1.y - star2.y);
-            const distance = Math.hypot(dx, dy);
-            
-            if (distance < minDistance) {
-                minDistance = distance;
-            }
-            
-            // إذا كانت النجوم قريبة جداً
-            if (distance < 150) { // تغيير المعيار إلى 150 بدل 100
-                tooCloseCount++;
-                console.log(`❌ النجوم ${id1} و ${id2} قريبة جداً: ${distance.toFixed(1)}`);
-            }
-        });
-    });
-    
-    console.log(`📊 أقصر مسافة بين نجمين: ${minDistance.toFixed(1)}`);
-    console.log(`📊 عدد النجوم المتقاربة جداً: ${tooCloseCount}`);
-}
-
-// دالة لتحميل النجوم المرئية فقط
-function loadVisibleStars() {
-    // تكييف مسافة الرؤية مع DPR
-    const baseVisibleDistance = 1500;
-    const visibleDistance = baseVisibleDistance * (DPR > 1 ? 1.3 : 1);
-    
-    const visibleStars = [];
-    
-    STATIC_STARS_MAP.forEach(star => {
-        const dx = Math.abs(star.x - camera.x);
-        const dy = Math.abs(star.y - camera.y);
-        
-        if (dx < visibleDistance && dy < visibleDistance) {
-            visibleStars.push(star);
-        }
-    });
-    
-    return visibleStars;
-}
-
 // دالة لبدء الاستماع للتحديثات في الوقت الحقيقي
 function startMessagesListener() {
     try {
@@ -1264,7 +1065,7 @@ function startRepliesListener() {
           });
           console.log(`✅ تم تحميل الإعجابات. عدد الإعجابات في الكاش: ${cachedLikes.size}`);
       } catch (error) {
-        console.error("❌ فشل تحميل الإعجابات من Firebase:", error);
+          console.error("❌ فشل تحميل الإعجابات من Firebase:", error);
       }
   }
   
@@ -1322,8 +1123,8 @@ function startRepliesListener() {
       const starX = (star.x - camera.x) + cx;
       const starY = (star.y - camera.y) + cy;
       
-      heart.style.left = (canvasRect.left + starX) + 'px';
-      heart.style.top = (canvasRect.top + starY) + 'px';
+      heart.style.left = (canvasRect.left + starX/DPR) + 'px';
+      heart.style.top = (canvasRect.top + starY/DPR) + 'px';
       
       const tx = (Math.random() - 0.5) * 200;
       const ty = -100 - Math.random() * 100;
@@ -1383,14 +1184,12 @@ function startRepliesListener() {
         
         replyControlBtn.style.display = 'block';
         
+        // التحقق مما إذا كان المستخدم هو صاحب الرسالة
+        const isOwner = lastTouchedStar.uid === currentUser.uid;
+        
         // إظهار أزرار التعديل والحذف فقط لصاحب الرسالة
-        if (lastTouchedStar.uid === currentUser.uid) {
-            deleteMessageControlBtn.style.display = 'block';
-            editMessageControlBtn.style.display = 'block';
-        } else {
-            deleteMessageControlBtn.style.display = 'none';
-            editMessageControlBtn.style.display = 'none';
-        }
+        deleteMessageControlBtn.style.display = isOwner ? 'inline-block' : 'none';
+        editMessageControlBtn.style.display = isOwner ? 'inline-block' : 'none';
         
         addFavoriteControlBtn.style.display = 'block';
     } else {
@@ -1428,57 +1227,6 @@ function updateFavoriteButtonState() {
         addFavoriteControlBtn.classList.remove('favorite');
     }
 }
-
-// دالة حذف الرسالة (لصاحبها فقط)
-deleteMessageControlBtn.onclick = async () => {
-    if (!lastTouchedStar) {
-        showError("يرجى لمس نجمة تحتوي على رسالة أولاً.");
-        return;
-    }
-    
-    if (lastTouchedStar.uid !== currentUser.uid) {
-        showError("يمكنك حذف رسائلك فقط.");
-        return;
-    }
-    
-    const starId = lastTouchedStar.id.toString();
-    const starTitle = lastTouchedStar.title || 'رسالة';
-    
-    if (!confirm(`هل أنت متأكد من حذف "${starTitle}"؟`)) {
-        return;
-    }
-    
-    try {
-        await deleteDoc(doc(MESSAGES_COLLECTION, starId));
-        cachedMessages.delete(starId);
-        bindMessagesToStars(cachedMessages);
-        showSuccess(`تم حذف "${starTitle}" بنجاح`);
-        toggleControlButtons(false);
-    } catch (error) {
-        console.error("❌ فشل حذف الرسالة:", error);
-        showError("فشل حذف الرسالة. يرجى المحاولة لاحقاً.");
-    }
-};
-
-// دالة تعديل الرسالة (لصاحبها فقط)
-editMessageControlBtn.onclick = () => {
-    if (!lastTouchedStar) {
-        showError("يرجى لمس نجمة تحتوي على رسالة أولاً.");
-        return;
-    }
-    
-    if (lastTouchedStar.uid !== currentUser.uid) {
-        showError("يمكنك تعديل رسائلك فقط.");
-        return;
-    }
-    
-    activeStar = lastTouchedStar;
-    messageInput.value = lastTouchedStar.message || "";
-    titleInput.value = lastTouchedStar.title || "";
-    messageModal.style.display = "block";
-    
-    setTimeout(() => titleInput.focus(), 10);
-};
 
 addFavoriteControlBtn.onclick = async () => {
     if (!lastTouchedStar) {
@@ -1537,13 +1285,76 @@ addFavoriteControlBtn.onclick = async () => {
     }
 };
 
+// 🔥 دالة حذف الرسالة
+deleteMessageControlBtn.onclick = async () => {
+    if (!lastTouchedStar) {
+        showError("يرجى لمس نجمة تحتوي على رسالة أولاً.");
+        return;
+    }
+    
+    const starId = lastTouchedStar.id.toString();
+    const starTitle = lastTouchedStar.title || 'رسالة';
+    
+    // التحقق من أن المستخدم هو صاحب الرسالة
+    if (lastTouchedStar.uid !== currentUser.uid) {
+        showError("لا يمكنك حذف رسالة لم تكتبها.");
+        return;
+    }
+    
+    if (!confirm(`هل أنت متأكد من حذف الرسالة "${starTitle}"؟`)) {
+        return;
+    }
+    
+    try {
+        // حذف الرسالة من Firebase
+        await deleteDoc(doc(MESSAGES_COLLECTION, starId));
+        console.log(`✅ تم حذف الرسالة: ${starId}`);
+        
+        // تحديث الكاش المحلي
+        cachedMessages.delete(starId);
+        bindMessagesToStars(cachedMessages);
+        
+        // إخفاء أزرار التحكم
+        toggleControlButtons(false);
+        
+        showSuccess(`تم حذف الرسالة "${starTitle}" بنجاح.`);
+        
+    } catch (error) {
+        console.error("❌ فشل حذف الرسالة:", error);
+        showError("فشل حذف الرسالة. يرجى المحاولة لاحقاً.");
+    }
+};
+
+// 🔥 دالة تعديل الرسالة
+editMessageControlBtn.onclick = async () => {
+    if (!lastTouchedStar) {
+        showError("يرجى لمس نجمة تحتوي على رسالة أولاً.");
+        return;
+    }
+    
+    // التحقق من أن المستخدم هو صاحب الرسالة
+    if (lastTouchedStar.uid !== currentUser.uid) {
+        showError("لا يمكنك تعديل رسالة لم تكتبها.");
+        return;
+    }
+    
+    activeStar = lastTouchedStar;
+    messageInput.value = lastTouchedStar.message || "";
+    titleInput.value = lastTouchedStar.title || "";
+    messageModal.style.display = "block";
+    
+    setTimeout(() => titleInput.focus(), 10);
+};
+
 pinMessageControlBtn.onclick = () => {
     if (!lastTouchedStar) {
         showError("يرجى لمس نجمة أولاً.");
         return;
     }
 
-    if (!lastTouchedStar.hasMessage) {
+    const star = lastTouchedStar;
+
+    if (!star.hasMessage) {
           showError("هذه النجمة لا تحتوي على رسالة لتثبيتها.");
           return;
     }
@@ -1551,9 +1362,9 @@ pinMessageControlBtn.onclick = () => {
     let alreadyPinned = false;
     document.querySelectorAll('.starMessage.pinned').forEach(div => {
         const pinnedStarId = parseInt(div.dataset.starId);
-        if (pinnedStarId !== lastTouchedStar.id) {
+        if (pinnedStarId !== star.id) {
             div.classList.remove('pinned');
-            const oldStar = STATIC_STARS_MAP.get(pinnedStarId);
+            const oldStar = stars.find(s => s.id === pinnedStarId);
             if (oldStar) {
                 hideStarMessageDiv(div, oldStar);  
             } else {
@@ -1564,11 +1375,11 @@ pinMessageControlBtn.onclick = () => {
         }
     });
     
-    let existingDiv = document.querySelector(`.starMessage[data-star-id="${lastTouchedStar.id}"]`);
+    let existingDiv = document.querySelector(`.starMessage[data-star-id="${star.id}"]`);
     
     if (!existingDiv) {
-        showStarMessage(lastTouchedStar);
-        existingDiv = document.querySelector(`.starMessage[data-star-id="${lastTouchedStar.id}"]`);
+        showStarMessage(star);
+        existingDiv = document.querySelector(`.starMessage[data-star-id="${star.id}"]`);
     }
     
     if (existingDiv) {
@@ -1577,10 +1388,10 @@ pinMessageControlBtn.onclick = () => {
         updatePinButtonText(isPinned);
         
         if (isPinned) {
-            clearTimeout(lastTouchedStar.hideTimeout);  
+            clearTimeout(star.hideTimeout);  
         } else {
-            clearTimeout(lastTouchedStar.hideTimeout);
-            lastTouchedStar.hideTimeout = setTimeout(() => hideStarMessageDiv(existingDiv, lastTouchedStar), 5000);  
+            clearTimeout(star.hideTimeout);
+            star.hideTimeout = setTimeout(() => hideStarMessageDiv(existingDiv, star), 5000);  
         }
     }
 };
@@ -1712,7 +1523,7 @@ function cleanupFavorites() {
     
     // تصفية المفضلة للحفاظ على النجوم الموجودة فقط
     currentUser.favorites = currentUser.favorites.filter(starId => {
-        const star = STATIC_STARS_MAP.get(starId);
+        const star = stars.find(s => s.id === starId);
         return star && star.hasMessage; // إرجاع true فقط إذا النجمة موجودة ولها رسالة
     });
     
@@ -1751,7 +1562,7 @@ async function showFavoritesModal() {
             }
         } else {
             for (const starId of currentUser.favorites) {
-                const star = STATIC_STARS_MAP.get(starId);
+                const star = stars.find(s => s.id === starId);
                 if (star && star.hasMessage) {
                     favoritesHTML.push(`
                         <div>
@@ -1779,7 +1590,7 @@ async function showFavoritesModal() {
             
             document.querySelectorAll('.remove-favorite-btn').forEach(btn => {
                 btn.onclick = async (e) => {
-                    const starId = parseInt(e.target.dataset.id);
+                    const starId = e.target.dataset.id;
                     await removeFavorite(starId);
                 };
             });
@@ -1795,8 +1606,11 @@ async function showFavoritesModal() {
 
 async function removeFavorite(starId) {
     try {
-        // تصفية المفضلة
-        currentUser.favorites = currentUser.favorites.filter(id => id !== starId);
+        // تحويل starId إلى رقم
+        const starIdNum = parseInt(starId);
+        
+        // تصفية المفضلة مع المقارنة كأرقام
+        currentUser.favorites = currentUser.favorites.filter(id => id !== starIdNum);
         
         // حفظ في localStorage أولاً
         saveUserToLocal();
@@ -1814,7 +1628,7 @@ async function removeFavorite(starId) {
         
         await showFavoritesModal();
         
-        if (lastTouchedStar && lastTouchedStar.id === starId) {
+        if (lastTouchedStar && lastTouchedStar.id.toString() === starId) {
             updateFavoriteButtonState();
         }
         
@@ -1835,13 +1649,30 @@ closeFavoritesBtn.onclick = () => {
     favoritesModal.style.display = 'none';
 };
 
+// 🔥 دالة جديدة لتحميل كل الرسائل مرة واحدة
+async function loadAllMessagesOnce() {
+    try {
+        console.log("🚀 جاري تحميل جميع الرسائل مرة واحدة...");
+        const querySnapshot = await getDocs(MESSAGES_COLLECTION);
+        
+        cachedMessages.clear();
+        querySnapshot.forEach((doc) => {
+            cachedMessages.set(doc.id, doc.data());
+        });
+        
+        console.log(`✅ تم تحميل ${cachedMessages.size} رسالة مرة واحدة`);
+        bindMessagesToStars(cachedMessages);
+        
+    } catch (error) {
+        console.error("❌ فشل تحميل الرسائل مرة واحدة:", error);
+    }
+}
+
 async function updateUI() { 
     loadUserFromLocal();
     
-    // تهيئة الخريطة الثابتة أولاً
-    initializeStaticMap();
-    
-    await loadAndCacheStars();  
+    // 🔥 استخدام الدالة الجديدة لتحميل كل الرسائل مرة واحدة
+    await loadAllMessagesOnce();
     await loadAndCacheLikes();
     await loadFavoritesList();
     // تنظيف المفضلة من الرسائل غير الموجودة
@@ -1874,7 +1705,7 @@ function hideStarMessageDiv(div, star) {
             div.remove();  
             star.showing = false;  
             
-            const anyMessageOpen = Array.from(STATIC_STARS_MAP.values()).some(s => s.showing && s.hasMessage);
+            const anyMessageOpen = stars.some(s => s.showing && s.hasMessage);
             if (!anyMessageOpen) {
                 fabButton.style.display = 'block';
             }
@@ -2007,8 +1838,81 @@ let DPR=window.devicePixelRatio||1;
 function resize(){canvas.width=innerWidth*DPR;canvas.height=innerHeight*DPR;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';}
 window.addEventListener('resize',resize);resize();
 
+const CELL_SIZE=800;
+let starDensity=0.5;
 const camera={x:0,y:0,tx:0,ty:0};
+const stars=[];
+const generatedCells=new Set();
+let starId=0;
+
 let isAutoMoving = false;
+
+function cellKey(cx,cy){return cx+','+cy;}
+
+function generateCell(cx,cy){
+  const key=cellKey(cx,cy);
+  if(generatedCells.has(key))return;
+  generatedCells.add(key);
+  let seed=(cx*374761393+cy*668265263)>>>0;
+  function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
+  const baseCount=Math.floor(80*starDensity);
+  const count=baseCount+Math.floor(rnd()*baseCount);
+  const minDistance=60*DPR;
+  
+  for(let i=0;i<count;i++){
+    let tries=0,ok=false,wx,wy;
+    while(tries<100 && !ok){
+      wx=cx*CELL_SIZE+rnd()*CELL_SIZE;
+      wy=cy*CELL_SIZE+rnd()*CELL_SIZE;
+      ok=true;
+      for(const s of stars){
+        const dx=s.x-wx,dy=s.y-wy;
+        if(Math.abs(dx)<minDistance && Math.abs(dy)<minDistance){ok=false;break;}
+      }
+      tries++;
+    }
+    if(ok){
+      const isMoon = starId === 0;
+      
+      const normalSize = Math.max(0.6, rnd()*2.5)*DPR;
+      const moonSize = 60 * DPR;
+      const size = isMoon ? moonSize : normalSize;
+      
+      const brightness=0.4+rnd()*0.6;
+      const pulseSpeed=0.5+rnd()*1.5;
+      const phase=rnd()*Math.PI*2;
+      
+      stars.push({
+        id: starId++,
+        x: wx,
+        y: wy, 
+        size,
+        brightness,
+        pulseSpeed,
+        phase, 
+        message: null,
+        hasMessage: false,
+        title: null,
+        opened: false,
+        showing: false, 
+        docId: null, 
+        uid: null, 
+        isPinned: false,
+        isMoon: isMoon
+      });
+    }
+  }
+}
+
+function generateNearby(){
+  const camCellX=Math.floor(camera.x/CELL_SIZE);
+  const camCellY=Math.floor(camera.y/CELL_SIZE);
+  for(let dx=-2;dx<=2;dx++){
+    for(let dy=-2;dy<=2;dy++){
+      generateCell(camCellX+dx,camCellY+dy);
+    }
+  }
+}
 
 function drawMessageConnections(time) {
     const w = canvas.width, h = canvas.height;
@@ -2021,7 +1925,7 @@ function drawMessageConnections(time) {
         if (div.style.opacity === '0' || div.style.display === 'none') return;
 
         const starId = parseInt(div.dataset.starId);
-        const star = STATIC_STARS_MAP.get(starId);
+        const star = stars.find(s => s.id === starId);
 
         if (star) {
             const star_sx = (star.x - camera.x) + cx;
@@ -2065,16 +1969,10 @@ function draw(time){
   
   drawMessageConnections(time); 
 
-  // رسم النجوم المرئية فقط
-  const visibleStars = loadVisibleStars();
-  
-  for(const s of visibleStars){
+  for(const s of stars){
     const sx=(s.x-camera.x)+cx;
     const sy=(s.y-camera.y)+cy;
-    
-    // زيادة مسافة التخطي للنجوم البعيدة بناءً على DPR
-    const skipDistance = 100 * (DPR > 1 ? 1.5 : 1);
-    if(sx<-skipDistance||sx>w+skipDistance||sy<-skipDistance||sy>h+skipDistance)continue;
+    if(sx<-50||sx>w+50||sy<-50||sy>h+50)continue;
     
     if(s.id === 0 && moonImageLoaded) {
         const moonSize = 120 * DPR;
@@ -2090,11 +1988,7 @@ function draw(time){
     }
     
     const pulse=Math.sin(time*s.pulseSpeed/1000 + s.phase)*0.3 + 0.7;
-    
-    // تكييس حجم التوهج بناءً على DPR
-    const glowMultiplier = DPR > 1 ? 0.8 : 1; // تقليل التوهج قليلاً على الهواتف
-    const glow=s.size*(5+pulse*3)*DPR * glowMultiplier;
-    
+    const glow=s.size*(5+pulse*3);
     const brightness=s.brightness*pulse;
     ctx.save();
     const grad=ctx.createRadialGradient(sx,sy,0,sx,sy,glow);
@@ -2111,12 +2005,7 @@ function draw(time){
     }  
     
     ctx.fillStyle = starColor;
-    
-    // تكييس حجم النجم بناءً على DPR
-    const starSizeMultiplier = DPR > 1 ? 0.9 : 1; // تصغير النجوم قليلاً على الهواتف
-    ctx.globalAlpha=brightness; 
-    ctx.arc(sx,sy,s.size*DPR * starSizeMultiplier,0,Math.PI*2); 
-    ctx.fill();
+    ctx.globalAlpha=brightness; ctx.arc(sx,sy,s.size,0,Math.PI*2); ctx.fill();
     ctx.globalAlpha=1;
     
     let textColor = '#fff';  
@@ -2132,9 +2021,7 @@ function draw(time){
     const rawText = s.title || s.id.toString();
     const text = rawText.substring(0, 15);  
     
-    // تكييس مسافة النص عن النجم بناءً على DPR
-    const textDistance = 15 * DPR * (DPR > 1 ? 1.2 : 1);
-    ctx.fillText(text, sx, sy - textDistance);
+    ctx.fillText(text,sx,sy-15*DPR);
   }
 }
 
@@ -2153,6 +2040,7 @@ function update(dt){
             camera.y += dy * smoothing * 60 * dt;
         }
     }
+    generateNearby();
 }
 
 let currentStarIndex = -1;
@@ -2163,7 +2051,7 @@ function resetStarNavigation() {
 }
 
 navigateStarBtn.onclick = () => {
-    let starsWithMessage = allStarsWithMessages;
+    let starsWithMessage = stars.filter(s => s.hasMessage);
     
     switch (navigationMode) {
         case 'favorites':
@@ -2260,18 +2148,15 @@ titleInput.addEventListener('input', () => {
 function bindMessagesToStars(messagesCache){
   console.log(`🔗 جاري ربط ${messagesCache.size} رسالة بالنجوم...`);
   
-  // إعادة تعيين جميع النجوم
-  STATIC_STARS_MAP.forEach(star => {
-    star.message = null;
-    star.hasMessage = false;
-    star.title = null;
-    star.opened = false;
-    star.docId = null;  
-    star.uid = null;  
-    star.isPinned = false;  
+  stars.forEach(s => {
+    s.message = null;
+    s.hasMessage = false;
+    s.title = null;
+    s.opened = false;
+    s.docId = null;  
+    s.uid = null;  
+    s.isPinned = false;  
   });
-  
-  allStarsWithMessages = []; // إعادة تعيين القائمة
   
   const readStarIds = currentUser.readStarIds || {};
 
@@ -2279,7 +2164,7 @@ function bindMessagesToStars(messagesCache){
   
   messagesCache.forEach((data, id) => {
     const starId = parseInt(id);
-    const star = STATIC_STARS_MAP.get(starId);  
+    const star = stars.find(s => s.id === starId);  
     
     if (star) {
       star.message = data.text || null;  
@@ -2288,14 +2173,11 @@ function bindMessagesToStars(messagesCache){
       star.docId = id.toString();  
       star.uid = data.uid || null;  
       star.opened = !!readStarIds[starId];
-      
-      // إضافة إلى القائمة المنفصلة
-      allStarsWithMessages.push(star);
       matchedCount++;
     }
   });
   
-  console.log(`✅ تم ربط ${matchedCount} رسالة بنجوم موجودة في القائمة المنفصلة`);
+  console.log(`✅ تم ربط ${matchedCount} رسالة بنجوم موجودة`);
   
   resetStarNavigation(); 
   draw(performance.now());
@@ -2304,8 +2186,9 @@ function bindMessagesToStars(messagesCache){
 }
 
 function updateMessageCounts() {
-    const allCount = allStarsWithMessages.length;
-    const favoritesCount = allStarsWithMessages.filter(s => 
+    const starsWithMessage = stars.filter(s => s.hasMessage);
+    const allCount = starsWithMessage.length;
+    const favoritesCount = starsWithMessage.filter(s => 
     currentUser.favorites.includes(s.id)
 ).length;
     
@@ -2344,19 +2227,13 @@ canvas.addEventListener('click', e=>{
   const x=(e.clientX-rect.left)*DPR;
   const y=(e.clientY-rect.top)*DPR;
   const cx=canvas.width/2,cy=canvas.height/2;
-  
   let nearest=null,minDist=15*DPR;
-  
-  // البحث في النجوم المرئية فقط
-  const visibleStars = loadVisibleStars();
-  
-  for(const s of visibleStars){
+  for(const s of stars){
     const sx=(s.x-camera.x)+cx;
     const sy=(s.y-camera.y)+cy;
     const d=Math.hypot(sx-x,sy-y);
     if(d<minDist){nearest=s;minDist=d;}
   }
-  
   if(nearest){
   lastTouchedStar = nearest;  
   
@@ -2364,7 +2241,7 @@ canvas.addEventListener('click', e=>{
       if (div.classList.contains('pinned') && parseInt(div.dataset.starId) !== nearest.id) return;
       
       const starId = parseInt(div.dataset.starId);
-      const star = STATIC_STARS_MAP.get(starId);
+      const star = stars.find(s => s.id === starId);
       if (star) hideStarMessageDiv(div, star);
   });
   
@@ -2403,7 +2280,7 @@ canvas.addEventListener('click', e=>{
 } else {
   toggleControlButtons(false);
   
-  const anyMessageOpen = Array.from(STATIC_STARS_MAP.values()).some(s => s.showing && s.hasMessage);
+  const anyMessageOpen = stars.some(s => s.showing && s.hasMessage);
   if (!anyMessageOpen) {
       fabButton.style.display = 'block';
   }
@@ -2444,7 +2321,7 @@ sendBtn.onclick = async () => {
 
               } catch (e) {
                 console.error("❌ خطأ أثناء الحذف من فايبربيس:", e);
-                showError("فشل حذف الرسالة. تأكد من استرار الاتصال.");
+                showError("فشل حذف الرسالة. تأكد من استمرار الاتصال.");
               }
         }
         
@@ -2503,7 +2380,7 @@ cancelBtn.onclick=()=>{messageModal.style.display="none";activeStar=null;};
 function showStarMessage(star){
   document.querySelectorAll('.starMessage:not(.pinned)').forEach(div => {
       const starId = parseInt(div.dataset.starId);
-      const s = STATIC_STARS_MAP.get(starId);
+      const s = stars.find(s => s.id === starId);
       if (s) hideStarMessageDiv(div, s);
   });
   
@@ -2580,6 +2457,7 @@ function showStarMessage(star){
 let last=performance.now();
 
 function loop(now){const dt=(now-last)/1000;last=now;update(dt);draw(now);requestAnimationFrame(loop);}
+generateNearby();
 
 function formatArabicDate(timestamp) {
     const date = new Date(timestamp);
