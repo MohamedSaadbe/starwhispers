@@ -687,6 +687,31 @@ canvas {
     image-rendering: pixelated;
 }
 
+/* الجويستيك بالشكل المطلوب */
+#joystickContainer {
+    position: fixed; 
+    bottom: 40px; 
+    left: 40px; 
+    width: 100px; 
+    height: 100px; 
+    background: rgba(255,255,255,0.1); 
+    border: 2px solid rgba(255,255,255,0.3); 
+    border-radius: 50%; 
+    z-index: 20; 
+    touch-action: none;
+}
+
+#joystick {
+    position: absolute; 
+    width: 50px; 
+    height: 50px; 
+    left: 25px; 
+    top: 25px; 
+    background: rgba(255,255,255,0.4); 
+    border-radius: 50%; 
+    pointer-events: none;
+}
+
 </style>
 </head>
 <body>
@@ -694,6 +719,11 @@ canvas {
 
 <!-- حاوية القلوب الطائرة -->
 <div id="flyingHeartsContainer" class="flying-hearts-container"></div>
+
+<!-- الجويستيك بالشكل المطلوب -->
+<div id="joystickContainer">
+    <div id="joystick"></div>
+</div>
 
 <button id="fabButton">⚙️</button>
 
@@ -1270,8 +1300,6 @@ pinMessageControlBtn.onclick = () => {
         return;
     }
 
-    const star = lastTouchedStar;
-
     if (!star.hasMessage) {
           showError("هذه النجمة لا تحتوي على رسالة لتثبيتها.");
           return;
@@ -1792,12 +1820,18 @@ window.addEventListener('resize',resize);resize();
 
 const CELL_SIZE=800;
 let starDensity=0.3; // 🔥 قلل الكثافة علشان الأداء
-const camera={x:0,y:0,tx:0,ty:0};
+const camera={x:0,y:0,tx:0,ty:0,vx:0,vy:0};
 const stars=[];
 const generatedCells=new Set();
 let starId=0;
 
 let isAutoMoving = false;
+
+// 🔥 إضافة متغيرات الجويستيك
+const joystickContainer = document.getElementById('joystickContainer');
+const joystick = document.getElementById('joystick');
+let joyActive = false;
+const joyCenter = {x: 50, y: 50}; // مركز الجويستيك
 
 function cellKey(cx,cy){return cx+','+cy;}
 
@@ -2007,6 +2041,10 @@ function update(dt){
             camera.x += dx * smoothing * 60 * dt;
             camera.y += dy * smoothing * 60 * dt;
         }
+    } else {
+        // 🔥 تحريك الكاميرا بناءً على سرعة الجويستيك
+        camera.x += camera.vx * dt;
+        camera.y += camera.vy * dt;
     }
     generateNearby();
 }
@@ -2308,6 +2346,37 @@ function showError(message) {
 function showSuccess(message) {
     alert(`✅ ${message}`);
 }
+
+// 🔥 إضافة وظائف الجويستيك بالشكل المطلوب
+function moveJoy(e){
+  const rect = joystickContainer.getBoundingClientRect();
+  const x = e.clientX - rect.left, y = e.clientY - rect.top;
+  const dx = x - joyCenter.x, dy = y - joyCenter.y;
+  const dist = Math.min(Math.hypot(dx, dy), 40);
+  const angle = Math.atan2(dy, dx);
+  
+  // حركة الجويستيك المرئية
+  joystick.style.left = (joyCenter.x + Math.cos(angle) * dist - 25) + 'px';
+  joystick.style.top = (joyCenter.y + Math.sin(angle) * dist - 25) + 'px';
+  
+  // تحديد سرعة الكاميرا
+  camera.vx = Math.cos(angle) * dist * 8;
+  camera.vy = Math.sin(angle) * dist * 8;
+}
+
+function resetJoy(){
+  joyActive = false;
+  joystick.style.left = '25px';
+  joystick.style.top = '25px';
+  camera.vx = 0;
+  camera.vy = 0;
+}
+
+// إضافة event listeners للجويستيك
+joystickContainer.addEventListener('pointerdown', e => {joyActive = true; moveJoy(e);});
+joystickContainer.addEventListener('pointermove', e => {if(joyActive) moveJoy(e);});
+joystickContainer.addEventListener('pointerup', resetJoy);
+joystickContainer.addEventListener('pointercancel', resetJoy);
 
 // بدء التطبيق مباشرة
 updateUI();  
