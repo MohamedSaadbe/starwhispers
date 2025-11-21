@@ -1668,6 +1668,82 @@ async function loadAllMessagesOnce() {
     }
 }
 
+// 🔥 دالة محسنة لربط الرسائل بالنجوم - تعرض كل الرسائل
+function bindMessagesToStars(messagesCache){
+  console.log(`🔗 جاري ربط ${messagesCache.size} رسالة بالنجوم...`);
+  
+  // أولاً: نمسح كل الرسائل القديمة
+  stars.forEach(s => {
+    s.message = null;
+    s.hasMessage = false;
+    s.title = null;
+    s.opened = false;
+    s.docId = null;  
+    s.uid = null;  
+    s.isPinned = false;  
+  });
+  
+  const readStarIds = currentUser.readStarIds || {};
+  let matchedCount = 0;
+  
+  // ثانياً: نربط كل الرسائل من الكاش
+  messagesCache.forEach((data, id) => {
+    const starId = parseInt(id);
+    let star = stars.find(s => s.id === starId);  
+    
+    // إذا النجمة موجودة بالفعل، نربط بيها الرسالة
+    if (star) {
+      star.message = data.text || null;  
+      star.hasMessage = !!data.text;
+      star.title = data.title || null;  
+      star.docId = id.toString();  
+      star.uid = data.uid || null;  
+      star.opened = !!readStarIds[starId];
+      matchedCount++;
+    } else {
+      // إذا النجمة مش موجودة، ننشئ نجمة جديدة في مكان عشوائي
+      const newStar = createNewStarWithMessage(starId, data);
+      stars.push(newStar);
+      matchedCount++;
+    }
+  });
+  
+  console.log(`✅ تم ربط ${matchedCount} رسالة (${stars.filter(s => s.hasMessage).length} نجمة مع رسالة)`);
+  
+  resetStarNavigation(); 
+  draw(performance.now());
+  updateMessageCounts();
+}
+
+// 🔥 دالة مساعدة لإنشاء نجمة جديدة برسالة
+function createNewStarWithMessage(starId, messageData) {
+  // نحدد مكان عشوائي للنجمة الجديدة في مساحة واسعة
+  const worldSize = CELL_SIZE * 20; // مساحة أكبر للعالم
+  const wx = (Math.random() - 0.5) * worldSize;
+  const wy = (Math.random() - 0.5) * worldSize;
+  
+  const rnd = Math.random;
+  
+  return {
+    id: starId,
+    x: wx,
+    y: wy, 
+    size: Math.max(0.6, rnd() * 2.5) * DPR,
+    brightness: 0.4 + rnd() * 0.6,
+    pulseSpeed: 0.5 + rnd() * 1.5,
+    phase: rnd() * Math.PI * 2,
+    message: messageData.text || null,
+    hasMessage: !!messageData.text,
+    title: messageData.title || null,
+    opened: !!currentUser.readStarIds[starId],
+    showing: false, 
+    docId: starId.toString(),  
+    uid: messageData.uid || null,  
+    isPinned: false,
+    isMoon: false
+  };
+}
+
 async function updateUI() { 
     loadUserFromLocal();
     
@@ -1959,6 +2035,7 @@ function drawMessageConnections(time) {
     });
 }
 
+// 🔥 دالة الرسم المحسنة - تعرض كل النجوم اللي ليها رسالة
 function draw(time){
   const w=canvas.width,h=canvas.height;
   ctx.clearRect(0,0,w,h);
@@ -1972,7 +2049,9 @@ function draw(time){
   for(const s of stars){
     const sx=(s.x-camera.x)+cx;
     const sy=(s.y-camera.y)+cy;
-    if(sx<-50||sx>w+50||sy<-50||sy>h+50)continue;
+    
+    // 🔥 غير الشرط علشان يظهر كل النجوم اللي ليها رسالة + النجوم القريبة
+    if(s.hasMessage || (sx>=-50&&sx<=w+50&&sy>=-50&&sy<=h+50)){
     
     if(s.id === 0 && moonImageLoaded) {
         const moonSize = 120 * DPR;
@@ -2022,6 +2101,7 @@ function draw(time){
     const text = rawText.substring(0, 15);  
     
     ctx.fillText(text,sx,sy-15*DPR);
+    }
   }
 }
 
@@ -2145,46 +2225,6 @@ titleInput.addEventListener('input', () => {
   titleInput.value = titleInput.value.slice(0, 15);
 });
 
-function bindMessagesToStars(messagesCache){
-  console.log(`🔗 جاري ربط ${messagesCache.size} رسالة بالنجوم...`);
-  
-  stars.forEach(s => {
-    s.message = null;
-    s.hasMessage = false;
-    s.title = null;
-    s.opened = false;
-    s.docId = null;  
-    s.uid = null;  
-    s.isPinned = false;  
-  });
-  
-  const readStarIds = currentUser.readStarIds || {};
-
-  let matchedCount = 0;
-  
-  messagesCache.forEach((data, id) => {
-    const starId = parseInt(id);
-    const star = stars.find(s => s.id === starId);  
-    
-    if (star) {
-      star.message = data.text || null;  
-      star.hasMessage = !!data.text;
-      star.title = data.title || null;  
-      star.docId = id.toString();  
-      star.uid = data.uid || null;  
-      star.opened = !!readStarIds[starId];
-      matchedCount++;
-    }
-  });
-  
-  console.log(`✅ تم ربط ${matchedCount} رسالة بنجوم موجودة`);
-  
-  resetStarNavigation(); 
-  draw(performance.now());
-  
-  updateMessageCounts();
-}
-
 function updateMessageCounts() {
     const starsWithMessage = stars.filter(s => s.hasMessage);
     const allCount = starsWithMessage.length;
@@ -2194,25 +2234,6 @@ function updateMessageCounts() {
     
     allMessagesCount.innerText = allCount;
     favoritesMessagesCount.innerText = favoritesCount;
-}
-
-async function loadAndCacheStars(){
-  try {
-    console.log("🚀 جاري تحميل جميع الرسائل من Firebase...");
-    const querySnapshot = await getDocs(MESSAGES_COLLECTION);
-    
-    cachedMessages.clear();
-    querySnapshot.forEach((doc) => {
-        cachedMessages.set(doc.id, doc.data());
-    });
-    
-    console.log(`✅ تم تحميل ${cachedMessages.size} رسالة من Firebase`);
-    
-    bindMessagesToStars(cachedMessages);  
-
-  } catch (error) {
-    console.error("❌ فشل تحميل النجوم من Firebase:", error);
-  }
 }
 
 canvas.addEventListener('click', e=>{
