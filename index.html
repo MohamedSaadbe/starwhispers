@@ -158,42 +158,6 @@ canvas{
     box-shadow: none;
 }
 
-#navigateStarBtn {
-    position: fixed;
-    bottom: 80px;
-    left: 15px;
-    width: 75px; 
-    height: 75px; 
-    border-radius: 50%; 
-    background: transparent; 
-    border: none; 
-    color: transparent; 
-    font-size: 0; 
-    text-align: center;
-    cursor: pointer;
-    z-index: 20;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-    transition: all 0.3s ease;
-    display: block;
-    touch-action: manipulation;
-    background-image: url('spacecraft.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: brightness(1);
-}
-
-#navigateStarBtn:hover {
-    transform: scale(1.15);
-    filter: brightness(1.3);
-    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.5);
-}
-
-#navigateStarBtn:active {
-    transform: scale(0.9);
-    filter: brightness(0.8);
-}
-
 /* لوحة التحكم الجانبية - محسنة للجوال */
 #userPanel {
     position: fixed;
@@ -241,109 +205,67 @@ canvas{
     text-align: center;
 }
 
-/* قسم اختيار نوع الرسائل في لوحة التحكم */
-.message-type-section {
+/* قسم المفضلات في لوحة التحكم */
+.favorites-section {
     width: 100%;
     margin: 15px 0;
     padding: 12px 0;
     border-bottom: 1px solid var(--control-border);
 }
 
-.message-type-section h4 {
+.favorites-section h4 {
     margin: 0 0 12px 0;
     color: #0f0;
     font-size: 15px;
     text-align: center;
 }
 
-.message-type-options {
+.favorites-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
     width: 100%;
 }
 
-.message-type-option {
+.favorite-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
+    flex-direction: column;
+    padding: 10px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s;
     font-size: 13px;
     border: 1px solid transparent;
+    text-align: right;
 }
 
-.message-type-option:hover {
+.favorite-item:hover {
     background: rgba(255, 255, 255, 0.1);
+    border-color: #FFD700;
 }
 
-.message-type-option.active {
-    background: #0f0;
-    color: #000;
+.favorite-title {
+    color: #FFD700;
     font-weight: bold;
-    border-color: #0f0;
+    margin-bottom: 5px;
+    font-size: 14px;
 }
 
-.message-type-option .badge {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
-    border-radius: 12px;
-    padding: 2px 6px;
-    font-size: 10px;
-    min-width: 20px;
+.favorite-preview {
+    color: #87CEEB;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.no-favorites {
     text-align: center;
-}
-
-.message-type-option.active .badge {
-    background: rgba(0, 0, 0, 0.3);
-    color: #000;
-}
-
-/* قسم حالة الرسائل العامة */
-.message-status-section {
-    width: 100%;
-    margin: 12px 0;
+    color: #888;
+    font-size: 13px;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-}
-
-.message-status-section h5 {
-    margin: 0 0 8px 0;
-    color: #ffa500;
-    font-size: 13px;
-    text-align: center;
-}
-
-.message-status-options {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.message-status-option {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-size: 13px;
-}
-
-.message-status-option:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.message-status-option.active {
-    background: #ffa500;
-    color: #000;
-    font-weight: bold;
 }
 
 /* أزرار لوحة التحكم */
@@ -734,13 +656,6 @@ canvas{
         line-height: 45px;
     }
     
-    #navigateStarBtn {
-        width: 50px;
-        height: 50px;
-        font-size: 22px;
-        line-height: 50px;
-    }
-    
     .starMessage {
         font-size: 15px;
         padding: 10px 12px;
@@ -781,7 +696,6 @@ canvas {
 <div id="flyingHeartsContainer" class="flying-hearts-container"></div>
 
 <button id="fabButton">⚙️</button>
-<button id="navigateStarBtn">🔍</button>
 
 <!-- أزرار التحكم الجديدة أسفل الشاشة -->
 <div id="controlButtons">
@@ -800,35 +714,11 @@ canvas {
     <!-- تحية واسم المستخدم في الأعلى -->
     <div id="userGreeting">مرحباً في همسات النجوم! ✨</div>
     
-    <!-- قسم اختيار نوع الرسائل في لوحة التحكم -->
-    <div class="message-type-section">
-        <h4>نوع الرسائل</h4>
-        <div class="message-type-options">
-            <div class="message-type-option active" data-type="all">
-                <span>كل الرسائل</span>
-                <span class="badge" id="allMessagesCount">0</span>
-            </div>
-            
-            <div class="message-type-option" data-type="favorites">
-                <span>رسائل المفضلة</span>
-                <span class="badge" id="favoritesMessagesCount">0</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- قسم حالة الرسائل العامة - واحد لجميع الأنواع -->
-    <div class="message-status-section">
-        <h5>حالة الرسائل</h5>
-        <div class="message-status-options">
-            <div class="message-status-option active" data-status="all">
-                <span>الكل</span>
-            </div>
-            <div class="message-status-option" data-status="read">
-                <span>المقروءة</span>
-            </div>
-            <div class="message-status-option" data-status="unread">
-                <span>غير المقروءة</span>
-            </div>
+    <!-- قسم المفضلات في لوحة التحكم -->
+    <div class="favorites-section">
+        <h4>المفضلات</h4>
+        <div class="favorites-list" id="panelFavoritesList">
+            <!-- سيتم ملؤها ديناميكياً -->
         </div>
     </div>
 </div>
@@ -972,6 +862,7 @@ function startMessagesListener() {
             });
             
             updateMessageCounts();
+            updatePanelFavoritesList(); // تحديث قائمة المفضلات في اللوحة
         });
         
         console.log("✅ تم تفعيل الاستماع للتحديثات في الوقت الحقيقي");
@@ -1053,12 +944,9 @@ function startRepliesListener() {
 
   const userPanel = document.getElementById('userPanel');
   const userGreeting = document.getElementById('userGreeting');
+  const panelFavoritesList = document.getElementById('panelFavoritesList');
   
   const fabButton = document.getElementById('fabButton');
-  const navigateStarBtn = document.getElementById('navigateStarBtn');
-
-  const allMessagesCount = document.getElementById('allMessagesCount');
-  const favoritesMessagesCount = document.getElementById('favoritesMessagesCount');
 
   const controlButtons = document.getElementById('controlButtons');
   const editMessageControlBtn = document.getElementById('editMessageControlBtn');
@@ -1085,9 +973,6 @@ function startRepliesListener() {
   const sendBtn=document.getElementById('sendBtn');
   const cancelBtn=document.getElementById('cancelBtn');
   let activeStar=null;
-
-  let navigationMode = 'all';
-  let messageStatusFilter = 'all';
 
   let cachedLikes = new Map();
   
@@ -1306,6 +1191,7 @@ addFavoriteControlBtn.onclick = async () => {
         }
         
         updateMessageCounts();
+        updatePanelFavoritesList(); // تحديث قائمة المفضلات في اللوحة
         
     } catch (error) {
         console.error("❌ فشل تحديث قائمة المفضلة:", error);
@@ -1317,6 +1203,7 @@ addFavoriteControlBtn.onclick = async () => {
             `تمت إضافة ${starTitle} إلى قائمة المفضلة (محلياً).`
         );
         updateMessageCounts();
+        updatePanelFavoritesList(); // تحديث قائمة المفضلات في اللوحة
     }
 };
 
@@ -1481,6 +1368,7 @@ fabButton.onclick = (e) => {
     if (isPanelOpen) {
         userPanel.classList.add('open');
         fabButton.innerText = '✖️';
+        updatePanelFavoritesList(); // تحديث قائمة المفضلات عند فتح اللوحة
     } else {
         userPanel.classList.remove('open');
         fabButton.innerText = '⚙️';
@@ -1495,39 +1383,74 @@ function closePanel() {
     }
 }
 
-function setupMessageTypeOptions() {
-    const messageTypeOptions = document.querySelectorAll('.message-type-option');
-    const messageStatusOptions = document.querySelectorAll('.message-status-option');
+// 🔥 دالة تحديث قائمة المفضلات في اللوحة الجانبية
+function updatePanelFavoritesList() {
+    const favoritesHTML = [];
     
-    messageTypeOptions.forEach(option => {
-        option.addEventListener('click', (e) => {
-            const type = e.currentTarget.dataset.type;
-            
-            messageTypeOptions.forEach(opt => {
-                opt.classList.remove('active');
-            });
-            e.currentTarget.classList.add('active');
-            
-            navigationMode = type;
-            resetStarNavigation();
-            console.log(`✅ تم تغيير وضع التنقل إلى: ${type}`);
-        });
-    });
+    if (currentUser.favorites.length === 0) {
+        panelFavoritesList.innerHTML = '<div class="no-favorites">لا توجد رسائل في المفضلة</div>';
+        return;
+    }
     
-    messageStatusOptions.forEach(option => {
-        option.addEventListener('click', (e) => {
-            const status = e.currentTarget.dataset.status;
-            
-            e.currentTarget.closest('.message-status-options').querySelectorAll('.message-status-option').forEach(opt => {
-                opt.classList.remove('active');
+    // تنظيف المفضلة من الرسائل غير الموجودة
+    cleanupFavorites();
+    
+    for (const starId of currentUser.favorites) {
+        const star = stars.find(s => s.id === starId);
+        if (star && star.hasMessage) {
+            const preview = star.message.length > 50 ? star.message.substring(0, 50) + '...' : star.message;
+            favoritesHTML.push(`
+                <div class="favorite-item" data-star-id="${starId}">
+                    <div class="favorite-title">${star.title || 'رسالة بدون عنوان'}</div>
+                    <div class="favorite-preview">${preview}</div>
+                </div>
+            `);
+        }
+    }
+    
+    if (favoritesHTML.length === 0) {
+        panelFavoritesList.innerHTML = '<div class="no-favorites">لا توجد رسائل في المفضلة</div>';
+    } else {
+        panelFavoritesList.innerHTML = favoritesHTML.join('');
+        
+        // إضافة event listeners للعناصر
+        panelFavoritesList.querySelectorAll('.favorite-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const starId = parseInt(e.currentTarget.dataset.starId);
+                navigateToFavoriteStar(starId);
             });
-            e.currentTarget.classList.add('active');
-            
-            messageStatusFilter = status;
-            resetStarNavigation();
-            console.log(`✅ تم تغيير فلتر حالة الرسائل إلى: ${status}`);
         });
-    });
+    }
+}
+
+// 🔥 دالة التنقل إلى النجمة المفضلة
+function navigateToFavoriteStar(starId) {
+    const star = stars.find(s => s.id === starId);
+    if (star) {
+        // إغلاق اللوحة الجانبية
+        closePanel();
+        
+        // التنقل إلى النجمة
+        camera.tx = star.x;
+        camera.ty = star.y;
+        isAutoMoving = true;
+        
+        // عرض رسالة النجمة
+        lastTouchedStar = star;
+        showStarMessage(star);
+        
+        if (star.hasMessage && !star.opened) {
+            star.opened = true;
+            if (!currentUser.readStarIds[star.id]) {
+                currentUser.readStarIds[star.id] = true;
+                saveUserToLocal();
+            }
+        }
+        
+        console.log(`📍 تم التنقل إلى النجمة المفضلة (ID: ${starId})`);
+    } else {
+        showError("لم يتم العثور على الرسالة المفضلة.");
+    }
 }
 
 async function loadFavoritesList() {
@@ -1664,6 +1587,7 @@ async function removeFavorite(starId) {
         }
         
         updateMessageCounts();
+        updatePanelFavoritesList(); // تحديث قائمة المفضلات في اللوحة
         
         showSuccess("تمت إزالة الرسالة من المفضلة.");
         
@@ -1673,6 +1597,7 @@ async function removeFavorite(starId) {
         // في حالة الخطأ، نعتمد على localStorage
         showSuccess("تمت إزالة الرسالة من المفضلة (محلياً).");
         updateMessageCounts();
+        updatePanelFavoritesList(); // تحديث قائمة المفضلات في اللوحة
     }
 }
 
@@ -1713,16 +1638,12 @@ async function updateUI() {
     startLikesListener();
     startRepliesListener();
     
-    resetStarNavigation();
-    
     fabButton.style.display = 'block';  
     userPanel.style.display = 'flex';
-    navigateStarBtn.style.display = 'block';
     controlButtons.style.display = 'none';
     
-    setupMessageTypeOptions();
-    
     updateMessageCounts();
+    updatePanelFavoritesList(); // تحديث قائمة المفضلات في اللوحة
 }
 
 closeLikersBtn.onclick = () => {
@@ -2090,117 +2011,12 @@ function update(dt){
     generateNearby();
 }
 
-let currentStarIndex = -1;
-
-function resetStarNavigation() {
-    currentStarIndex = -1;
-    console.log("🔄 تم إعادة تعيين فهرس التنقل بين النجوم");
-}
-
-navigateStarBtn.onclick = () => {
-    let starsWithMessage = stars.filter(s => s.hasMessage);
-    
-    switch (navigationMode) {
-        case 'favorites':
-            starsWithMessage = starsWithMessage.filter(s => 
-    currentUser.favorites.includes(s.id)
-);
-            break;
-    }
-    
-    if (messageStatusFilter !== 'all') {
-        starsWithMessage = starsWithMessage.filter(s => {
-            const isRead = currentUser.readStarIds[s.id] || false;
-            return messageStatusFilter === 'read' ? isRead : !isRead;
-        });
-    }
-    
-    starsWithMessage.sort((a, b) => a.id - b.id);
-    
-    if (starsWithMessage.length === 0) {
-        showError("لا توجد رسائل تطابق معايير البحث الحالية.");
-        return;
-    }
-    
-    if (currentStarIndex >= starsWithMessage.length || currentStarIndex < 0) {
-        resetStarNavigation();
-    }
-    
-    currentStarIndex = (currentStarIndex + 1) % starsWithMessage.length;
-    
-    const targetStar = starsWithMessage[currentStarIndex];
-    
-    camera.tx = targetStar.x;
-    camera.ty = targetStar.y;
-    
-    isAutoMoving = true;
-    
-    lastTouchedStar = targetStar;
-    showStarMessage(targetStar);
-    
-    if (targetStar.hasMessage && !targetStar.opened) {
-        targetStar.opened = true;
-        if (!currentUser.readStarIds[targetStar.id]) {
-            currentUser.readStarIds[targetStar.id] = true;
-            saveUserToLocal();
-        }
-    }
-    
-    console.log(`📍 التنقل إلى النجمة ${currentStarIndex + 1} من ${starsWithMessage.length} (ID: ${targetStar.id})`);
-};
-
-let isDragging = false;
-let lastPointerX, lastPointerY;
-const DRAG_SENSITIVITY = 1.0; 
-
-canvas.addEventListener('pointerdown', e => {
-    if (e.target.closest('#navigateStarBtn, #messageModal, #userPanel, #fabButton, #likersModal, #controlButtons, #favoritesModal, #replyModal')) {
-        isDragging = false;
-        return;
-    }
-    
-    isDragging = true;
-    lastPointerX = e.clientX;
-    lastPointerY = e.clientY;
-    
-    isAutoMoving = false;
-
-    e.preventDefault(); 
-    canvas.setPointerCapture(e.pointerId); 
-});
-
-canvas.addEventListener('pointermove', e => {
-    if (!isDragging) return;
-    
-    const dx = e.clientX - lastPointerX;
-    const dy = e.clientY - lastPointerY;
-
-    camera.x -= dx * DRAG_SENSITIVITY * DPR; 
-    camera.y -= dy * DRAG_SENSITIVITY * DPR;
-    camera.tx = camera.x;
-    camera.ty = camera.y;
-
-    lastPointerX = e.clientX;
-    lastPointerY = e.clientY;
-});
-
-canvas.addEventListener('pointerup', () => {
-    isDragging = false;
-});
-
-titleInput.addEventListener('input', () => {
-  titleInput.value = titleInput.value.slice(0, 15);
-});
-
 function updateMessageCounts() {
     const starsWithMessage = stars.filter(s => s.hasMessage);
     const allCount = starsWithMessage.length;
     const favoritesCount = starsWithMessage.filter(s => 
     currentUser.favorites.includes(s.id)
 ).length;
-    
-    allMessagesCount.innerText = allCount;
-    favoritesMessagesCount.innerText = favoritesCount;
 }
 
 canvas.addEventListener('click', e=>{
